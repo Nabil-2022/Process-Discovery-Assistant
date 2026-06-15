@@ -5,7 +5,7 @@ import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 import { adminApi, hasSuperAdminAccess } from './api';
 import { TenantsPage } from './TenantsPage';
 
-const statusColors = ['#1f9d8a', '#d97706', '#64748b'];
+const statusColors = ['#007aff', '#2f9e62', '#b7791f', '#6e6e73'];
 
 export function AdminDashboard() {
   const [period, setPeriod] = useState('30d');

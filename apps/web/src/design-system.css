@@ -1,0 +1,882 @@
+:root {
+  --pda-bg: #f5f5f7;
+  --pda-bg-elevated: #fbfbfd;
+  --pda-surface: rgba(255, 255, 255, 0.9);
+  --pda-surface-solid: #ffffff;
+  --pda-surface-muted: #fafafa;
+  --pda-text: #1d1d1f;
+  --pda-text-muted: #6e6e73;
+  --pda-text-subtle: #8a8a8f;
+  --pda-border: rgba(0, 0, 0, 0.08);
+  --pda-border-strong: rgba(0, 0, 0, 0.14);
+  --pda-blue: #007aff;
+  --pda-blue-dark: #0057d9;
+  --pda-green: #2f9e62;
+  --pda-amber: #b7791f;
+  --pda-red: #d92d20;
+  --pda-purple: #7c3aed;
+  --pda-radius-sm: 10px;
+  --pda-radius-md: 14px;
+  --pda-radius-lg: 22px;
+  --pda-radius-xl: 28px;
+  --pda-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 22px rgba(0, 0, 0, 0.04);
+  --pda-shadow-md: 0 18px 50px rgba(20, 22, 30, 0.08);
+  --pda-shadow-lg: 0 28px 70px rgba(20, 22, 30, 0.12);
+  --pda-focus: 0 0 0 4px rgba(0, 122, 255, 0.16);
+  --pda-font:
+    -apple-system, BlinkMacSystemFont, 'SF Pro Display', Inter, 'Segoe UI', system-ui, sans-serif;
+}
+
+html {
+  background:
+    radial-gradient(circle at 20% 0%, rgba(0, 122, 255, 0.08), transparent 34rem),
+    linear-gradient(180deg, #fbfbfd 0%, var(--pda-bg) 44%, #f0f2f5 100%);
+}
+
+body {
+  color: var(--pda-text);
+  background: transparent;
+  font-family: var(--pda-font);
+  font-size: 15px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body::selection {
+  background: rgba(0, 122, 255, 0.18);
+}
+
+a {
+  color: var(--pda-blue);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--pda-blue-dark);
+}
+
+button,
+.button-link,
+.admin-tabs a {
+  min-height: 40px;
+  border: 1px solid var(--pda-border);
+  border-radius: 999px;
+  background: linear-gradient(180deg, #ffffff 0%, #f7f7f9 100%);
+  color: var(--pda-text);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.9) inset;
+  font-weight: 650;
+  letter-spacing: 0;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease,
+    box-shadow 160ms ease,
+    color 160ms ease;
+}
+
+button:hover,
+.button-link:hover,
+.admin-tabs a:hover {
+  border-color: rgba(0, 122, 255, 0.28);
+  color: var(--pda-blue-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--pda-shadow-sm);
+}
+
+button:active,
+.button-link:active {
+  transform: translateY(0);
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: none;
+  border-color: rgba(0, 122, 255, 0.72);
+  box-shadow: var(--pda-focus);
+}
+
+button:disabled {
+  transform: none;
+  box-shadow: none;
+}
+
+input,
+select,
+textarea {
+  min-height: 42px;
+  border: 1px solid var(--pda-border);
+  border-radius: var(--pda-radius-sm);
+  background: rgba(255, 255, 255, 0.86);
+  color: var(--pda-text);
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    background 160ms ease;
+}
+
+input:hover,
+select:hover,
+textarea:hover {
+  border-color: var(--pda-border-strong);
+  background: #ffffff;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--pda-text-subtle);
+}
+
+label {
+  color: var(--pda-text);
+  font-weight: 600;
+}
+
+h1,
+h2,
+h3 {
+  color: var(--pda-text);
+  font-weight: 760;
+  line-height: 1.08;
+}
+
+.health-page,
+.admin-shell,
+.tenant-shell {
+  min-height: 100vh;
+  padding: 28px;
+}
+
+.tenant-shell,
+.admin-shell {
+  display: grid;
+  grid-template-columns: minmax(238px, 280px) minmax(0, 1fr);
+  align-items: start;
+  gap: 24px;
+  overflow-x: clip;
+}
+
+.tenant-shell > *,
+.admin-shell > *,
+.admin-panel,
+.workshop-content,
+.wizard-panel,
+.data-table-wrap,
+.bpmn-viewer {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.health-page {
+  background: transparent;
+}
+
+.admin-header {
+  position: sticky;
+  top: 28px;
+  display: grid;
+  align-content: start;
+  gap: 24px;
+  width: 100%;
+  max-width: none;
+  min-height: calc(100vh - 56px);
+  margin: 0;
+  border: 1px solid var(--pda-border);
+  border-radius: var(--pda-radius-xl);
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: var(--pda-shadow-md);
+  padding: 22px;
+  backdrop-filter: blur(18px);
+}
+
+.admin-header::before {
+  content: '';
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(0, 122, 255, 0.94), rgba(47, 158, 98, 0.86)), #007aff;
+  box-shadow: 0 14px 32px rgba(0, 122, 255, 0.22);
+}
+
+.admin-header > div {
+  display: grid;
+  gap: 8px;
+}
+
+.admin-header h1 {
+  max-width: 12ch;
+  font-size: clamp(1.55rem, 1.9vw, 2.2rem);
+}
+
+.eyebrow {
+  color: var(--pda-text-muted);
+  font-size: 0.72rem;
+  font-weight: 780;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.admin-tabs {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+}
+
+.admin-tabs a,
+.admin-tabs button {
+  justify-content: flex-start;
+  width: 100%;
+  min-height: 42px;
+  border-radius: 14px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--pda-text-muted);
+  text-align: left;
+}
+
+.admin-tabs a[href='/admin'] {
+  margin-top: 10px;
+  border-top: 1px solid var(--pda-border);
+  border-radius: 0 0 14px 14px;
+  padding-top: 12px;
+}
+
+.admin-tabs button.active,
+.workshop-tabs button.active,
+.wizard-sidebar nav button.active {
+  border-color: rgba(0, 122, 255, 0.18);
+  background: rgba(0, 122, 255, 0.1);
+  color: var(--pda-blue-dark);
+  box-shadow: none;
+}
+
+.admin-grid,
+.tenants-layout,
+.tenant-grid,
+.workshop-shell,
+.process-workbench {
+  grid-column: 2;
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+}
+
+.admin-grid,
+.tenants-layout,
+.tenant-grid {
+  gap: 18px;
+}
+
+.admin-toolbar {
+  border: 1px solid var(--pda-border);
+  border-radius: var(--pda-radius-lg);
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: var(--pda-shadow-sm);
+  padding: 12px;
+  backdrop-filter: blur(14px);
+}
+
+.metric-grid {
+  gap: 14px;
+}
+
+.metric-grid.small {
+  gap: 12px;
+}
+
+.metric,
+.admin-panel,
+.admin-empty,
+.tenant-drawer,
+.wizard-sidebar,
+.wizard-panel,
+.direction-card,
+.score-box,
+.quality-messages section,
+.procedure-sections section,
+.activity-board article,
+.workshop-header,
+.workshop-tabs,
+.workshop-content {
+  border: 1px solid var(--pda-border);
+  border-radius: var(--pda-radius-lg);
+  background: var(--pda-surface);
+  box-shadow: var(--pda-shadow-sm);
+}
+
+.admin-panel,
+.workshop-content,
+.wizard-panel {
+  padding: 20px;
+}
+
+.admin-panel {
+  min-height: 250px;
+}
+
+.admin-panel.compact {
+  border-radius: var(--pda-radius-md);
+  padding: 16px;
+}
+
+.admin-panel h2,
+.tenant-drawer h2,
+.tenant-drawer h3,
+.detail-tabs h3,
+.quality-messages h3,
+.submission-review h3 {
+  color: var(--pda-text);
+  font-size: 1rem;
+  font-weight: 760;
+}
+
+.metric {
+  position: relative;
+  overflow: hidden;
+  min-height: 106px;
+  padding: 16px;
+}
+
+.metric::after {
+  content: '';
+  position: absolute;
+  inset: auto 14px 12px auto;
+  width: 42px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(0, 122, 255, 0.2);
+}
+
+.metric span,
+.compact-list span,
+.activity-list time,
+.empty-inline,
+.score-box small,
+.activity-board span,
+.key-value span {
+  color: var(--pda-text-muted);
+}
+
+.metric strong {
+  margin-top: 14px;
+  color: var(--pda-text);
+  font-size: clamp(1.65rem, 2.2vw, 2.4rem);
+  font-weight: 780;
+}
+
+.metric.warning::after,
+.metric.warning strong {
+  color: var(--pda-amber);
+  background: rgba(183, 121, 31, 0.22);
+}
+
+.metric.skeleton,
+.table-skeleton {
+  border-radius: var(--pda-radius-lg);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.82), transparent), #eceef2;
+  background-size: 240px 100%;
+}
+
+.data-table-wrap {
+  border: 1px solid var(--pda-border);
+  border-radius: var(--pda-radius-lg);
+  background: #ffffff;
+}
+
+.data-table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.admin-panel > .data-table {
+  display: block;
+  overflow-x: auto;
+}
+
+.data-table th,
+.data-table td {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  padding: 13px 14px;
+}
+
+.data-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: rgba(250, 250, 250, 0.96);
+  color: var(--pda-text-muted);
+  font-size: 0.72rem;
+  font-weight: 760;
+  letter-spacing: 0;
+  backdrop-filter: blur(12px);
+}
+
+.data-table tbody tr {
+  transition:
+    background 140ms ease,
+    transform 140ms ease;
+}
+
+.data-table tbody tr:hover {
+  background: rgba(0, 122, 255, 0.045);
+}
+
+.status-badge,
+.save-state {
+  min-height: 26px;
+  border: 1px solid rgba(0, 122, 255, 0.14);
+  border-radius: 999px;
+  background: rgba(0, 122, 255, 0.09);
+  color: var(--pda-blue-dark);
+  font-size: 0.75rem;
+  font-weight: 760;
+}
+
+.status-badge.warning,
+.save-state.dirty,
+.save-state.saving {
+  border-color: rgba(183, 121, 31, 0.18);
+  background: rgba(183, 121, 31, 0.12);
+  color: var(--pda-amber);
+}
+
+.status-badge.error,
+.save-state.error,
+.save-state.conflict,
+.error-text {
+  color: var(--pda-red);
+}
+
+.save-state.error,
+.save-state.conflict {
+  border-color: rgba(217, 45, 32, 0.18);
+  background: rgba(217, 45, 32, 0.1);
+}
+
+.link-button {
+  color: var(--pda-blue);
+  font-weight: 700;
+}
+
+.button-link {
+  display: inline-flex;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.table-actions {
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.table-actions a {
+  display: inline-flex;
+  min-height: 30px;
+  align-items: center;
+  border-radius: 999px;
+  background: rgba(0, 122, 255, 0.08);
+  color: var(--pda-blue-dark);
+  padding: 0 10px;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.admin-empty {
+  border-radius: var(--pda-radius-xl);
+  padding: 34px;
+}
+
+.admin-empty h1,
+.admin-empty h2 {
+  margin: 10px 0;
+  font-size: clamp(2rem, 4vw, 3rem);
+}
+
+.admin-empty.error {
+  border-color: rgba(217, 45, 32, 0.18);
+  background: rgba(255, 255, 255, 0.86);
+}
+
+.tenant-drawer {
+  width: min(560px, 100vw);
+  border-radius: var(--pda-radius-xl) 0 0 var(--pda-radius-xl);
+  box-shadow: -28px 0 80px rgba(20, 22, 30, 0.18);
+}
+
+.feature-list label,
+.check-row {
+  border-color: var(--pda-border);
+  border-radius: var(--pda-radius-md);
+  background: rgba(250, 250, 250, 0.72);
+}
+
+.progress-bar {
+  height: 9px;
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.progress-bar span {
+  background: linear-gradient(90deg, var(--pda-blue), #32d583);
+}
+
+.direction-card {
+  padding: 18px;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    border-color 160ms ease;
+}
+
+.direction-card:hover {
+  border-color: rgba(0, 122, 255, 0.2);
+  box-shadow: var(--pda-shadow-md);
+  transform: translateY(-2px);
+}
+
+.process-workbench {
+  grid-template-columns: minmax(260px, 330px) minmax(0, 1fr);
+}
+
+.wizard-sidebar {
+  top: 28px;
+  padding: 20px;
+}
+
+.wizard-sidebar h1 {
+  font-size: 1.45rem;
+}
+
+.wizard-sidebar nav {
+  gap: 8px;
+}
+
+.wizard-sidebar nav button {
+  border-radius: 14px;
+  background: transparent;
+  color: var(--pda-text-muted);
+  box-shadow: none;
+}
+
+.wizard-sidebar nav button span {
+  background: rgba(0, 122, 255, 0.1);
+  color: var(--pda-blue-dark);
+}
+
+.wizard-panel {
+  min-height: 680px;
+}
+
+.wizard-panel-header {
+  border-bottom-color: var(--pda-border);
+}
+
+.wizard-panel-header h2 {
+  font-size: clamp(1.65rem, 2.4vw, 2.25rem);
+}
+
+.wizard-fields {
+  gap: 14px;
+}
+
+.activity-board article,
+.score-box,
+.quality-messages section,
+.procedure-sections section {
+  border-radius: var(--pda-radius-md);
+  background: rgba(255, 255, 255, 0.78);
+  padding: 14px;
+}
+
+.section-dot {
+  box-shadow: 0 0 0 4px rgba(138, 138, 143, 0.12);
+}
+
+.section-dot.complete {
+  background: var(--pda-green);
+}
+
+.section-dot.warning {
+  background: var(--pda-amber);
+}
+
+.section-dot.error {
+  background: var(--pda-red);
+}
+
+.quality-messages {
+  gap: 12px;
+}
+
+.wizard-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  border-top-color: var(--pda-border);
+  background: rgba(255, 255, 255, 0.82);
+  padding: 14px;
+  margin: 24px -14px -14px;
+  border-radius: 0 0 var(--pda-radius-lg) var(--pda-radius-lg);
+  backdrop-filter: blur(14px);
+}
+
+.analysis-output {
+  border-color: var(--pda-border);
+  border-radius: var(--pda-radius-md);
+  background: #fbfbfd;
+}
+
+.raci-matrix {
+  border-radius: var(--pda-radius-lg);
+}
+
+.raci-toolbar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+  align-items: stretch;
+}
+
+.raci-toolbar .metric {
+  min-width: 0;
+}
+
+.raci-toolbar button,
+.raci-toolbar .button-link {
+  align-self: center;
+  height: 40px;
+  width: auto;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.raci-matrix th:first-child,
+.raci-matrix td:first-child {
+  background: rgba(255, 255, 255, 0.96);
+}
+
+.raci-cell {
+  min-width: 36px;
+  min-height: 30px;
+  border: 1px solid rgba(0, 122, 255, 0.16);
+  border-radius: 999px;
+  background: rgba(0, 122, 255, 0.09);
+  color: var(--pda-blue-dark);
+}
+
+.bpmn-viewer {
+  min-height: 460px;
+  border-color: var(--pda-border);
+  border-radius: var(--pda-radius-lg);
+  background:
+    linear-gradient(rgba(0, 0, 0, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.025) 1px, transparent 1px), #fbfbfd;
+  background-size: 28px 28px;
+}
+
+.bpmn-viewer svg {
+  width: max(900px, 100%);
+  max-width: none;
+}
+
+.raci-preview,
+.raci-preview > *,
+.procedure-sections > *,
+.workshop-grid > *,
+.detail-tabs > * {
+  min-width: 0;
+}
+
+.bpmn-lane {
+  fill: rgba(255, 255, 255, 0.86);
+  stroke: rgba(0, 0, 0, 0.1);
+}
+
+.bpmn-lane-label {
+  fill: var(--pda-blue-dark);
+}
+
+.bpmn-edge {
+  stroke: #3a3a3c;
+}
+
+.bpmn-event {
+  fill: rgba(0, 122, 255, 0.08);
+  stroke: var(--pda-blue);
+}
+
+.bpmn-task {
+  fill: rgba(183, 121, 31, 0.08);
+  stroke: var(--pda-amber);
+}
+
+.bpmn-task.user {
+  fill: rgba(0, 122, 255, 0.08);
+  stroke: var(--pda-blue);
+}
+
+.bpmn-gateway {
+  fill: rgba(47, 158, 98, 0.08);
+  stroke: var(--pda-green);
+}
+
+.workshop-shell {
+  gap: 18px;
+}
+
+.workshop-header {
+  align-items: flex-start;
+  padding: 22px;
+}
+
+.workshop-header h1 {
+  font-size: clamp(1.85rem, 2.8vw, 3rem);
+}
+
+.workshop-actions {
+  gap: 10px;
+}
+
+.workshop-status {
+  gap: 14px;
+}
+
+.workshop-tabs {
+  position: sticky;
+  top: 18px;
+  z-index: 4;
+  gap: 8px;
+  padding: 10px;
+  backdrop-filter: blur(16px);
+}
+
+.workshop-tabs button {
+  min-height: 38px;
+  border-radius: 999px;
+}
+
+.workshop-grid {
+  gap: 16px;
+}
+
+.key-value {
+  border-bottom-color: var(--pda-border);
+}
+
+.compact-list article,
+.activity-list article {
+  border-bottom-color: var(--pda-border);
+  padding: 10px 0;
+}
+
+.procedure-sections {
+  gap: 14px;
+}
+
+.form-grid {
+  align-items: end;
+  gap: 12px;
+}
+
+input[type='checkbox'] {
+  width: 18px;
+  min-height: 18px;
+  accent-color: var(--pda-blue);
+}
+
+@media (max-width: 1180px) {
+  .tenant-shell,
+  .admin-shell {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .admin-header {
+    position: static;
+    min-height: 0;
+  }
+
+  .admin-header h1 {
+    max-width: none;
+  }
+
+  .admin-tabs {
+    grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+  }
+
+  .admin-tabs a[href='/admin'] {
+    margin-top: 0;
+    border-top: 1px solid var(--pda-border);
+    border-radius: 14px;
+    padding-top: 0;
+  }
+
+  .admin-grid,
+  .tenants-layout,
+  .tenant-grid,
+  .workshop-shell,
+  .process-workbench {
+    grid-column: 1;
+  }
+
+  .process-workbench {
+    grid-template-columns: 1fr;
+  }
+
+  .raci-preview {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .health-page,
+  .admin-shell,
+  .tenant-shell {
+    padding: 14px;
+  }
+
+  .admin-header {
+    border-radius: var(--pda-radius-lg);
+    padding: 16px;
+  }
+
+  .admin-tabs {
+    display: flex;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  .admin-tabs a,
+  .admin-tabs button {
+    flex: 0 0 auto;
+    width: auto;
+    white-space: nowrap;
+  }
+
+  .admin-toolbar {
+    padding: 10px;
+  }
+
+  .admin-panel,
+  .workshop-content,
+  .wizard-panel,
+  .admin-empty {
+    border-radius: var(--pda-radius-lg);
+    padding: 16px;
+  }
+
+  .workshop-tabs {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+  }
+
+  .workshop-tabs button {
+    flex: 0 0 auto;
+  }
+
+  .bpmn-viewer svg {
+    min-width: 760px;
+  }
+}

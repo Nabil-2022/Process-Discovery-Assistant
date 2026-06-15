@@ -1504,7 +1504,7 @@ function ExportDrawer({
 }) {
   return (
     <article className="admin-panel detail-panel">
-      <h2>ExportDrawer</h2>
+      <h2>Demander un export officiel</h2>
       <ExportTypeSelector value={exportType} onChange={onTypeChange} />
       <ExportFormatSelector value={exportFormat} onChange={onFormatChange} />
       <input
@@ -1533,7 +1533,7 @@ function ExportTypeSelector({
       <select value={value} onChange={(event) => onChange(event.target.value as ExportType)}>
         {exportTypes.map((type) => (
           <option key={type} value={type}>
-            {type}
+            {exportTypeLabel(type)}
           </option>
         ))}
       </select>
@@ -1554,7 +1554,7 @@ function ExportFormatSelector({
       <select value={value} onChange={(event) => onChange(event.target.value as ExportFormat)}>
         {exportFormats.map((format) => (
           <option key={format} value={format}>
-            {format}
+            {formatLabel(format)}
           </option>
         ))}
       </select>
@@ -1577,7 +1577,7 @@ function ExportJobList({
 }) {
   return (
     <article className="admin-panel wide detail-panel">
-      <h2>ExportJobList</h2>
+      <h2>Historique des exports</h2>
       {loading ? <p className="empty-inline">Chargement exports...</p> : null}
       {error ? <p className="error-text">{error.message}</p> : null}
       {jobs.length ? (
@@ -1595,8 +1595,8 @@ function ExportJobList({
             <tbody>
               {jobs.map((job) => (
                 <tr key={job.id}>
-                  <td>{job.exportType}</td>
-                  <td>{job.format}</td>
+                  <td>{exportTypeLabel(job.exportType as ExportType)}</td>
+                  <td>{formatLabel(job.format as ExportFormat)}</td>
                   <td>
                     <ExportStatusBadge status={job.status} />
                   </td>
@@ -1627,15 +1627,47 @@ function ExportJobList({
 }
 
 function ExportStatusBadge({ status }: { status: string }) {
-  return <span className="status-badge">ExportStatusBadge {status}</span>;
+  return <span className="status-badge">{status}</span>;
+}
+
+function exportTypeLabel(type: ExportType) {
+  const labels: Record<ExportType, string> = {
+    process_sheet: 'Fiche processus',
+    procedure: 'Procedure',
+    raci_matrix: 'Matrice RACI',
+    bpmn_diagram: 'Diagramme BPMN',
+    risk_register: 'Registre des risques',
+    kpi_register: 'Registre KPI',
+    backlog: 'Backlog',
+    direction_summary: 'Synthese direction',
+    executive_summary: 'Synthese executive',
+    morocco_compliance: 'Conformite Maroc',
+    process_mining_report: 'Rapport process mining',
+    audit_extract: 'Extrait audit',
+    full_package: 'Dossier complet',
+  };
+  return labels[type] ?? type;
+}
+
+function formatLabel(format: ExportFormat) {
+  const labels: Record<ExportFormat, string> = {
+    pdf: 'PDF',
+    docx: 'Word',
+    xlsx: 'Excel',
+    json: 'JSON',
+    bpmn_xml: 'BPMN XML',
+    zip: 'ZIP',
+    csv: 'CSV',
+  };
+  return labels[format] ?? format;
 }
 
 function ExportDownloadButton({ job }: { job: ExportJob }) {
   if (job.status !== 'COMPLETED')
-    return <span className="empty-inline">Download indisponible</span>;
+    return <span className="empty-inline">Telechargement indisponible</span>;
   return (
     <a className="button-link" href={tenantApi.exportDownloadUrl(job.id)}>
-      ExportDownloadButton
+      Telecharger
     </a>
   );
 }

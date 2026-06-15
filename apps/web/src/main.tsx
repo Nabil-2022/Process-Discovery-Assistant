@@ -5,6 +5,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 import { HealthPage } from './modules/health/HealthPage';
 import './styles.css';
+import './design-system.css';
 
 const queryClient = new QueryClient();
 const App = lazy(() => import('./modules/app/App').then((module) => ({ default: module.App })));
@@ -84,7 +85,17 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <Suspense fallback={<main className="tenant-shell">Chargement...</main>}>
+        <Suspense
+          fallback={
+            <main className="tenant-shell">
+              <section className="admin-empty">
+                <p className="eyebrow">Process Discovery Assistant</p>
+                <h1>Chargement</h1>
+                <div className="table-skeleton" aria-label="Chargement de l'interface" />
+              </section>
+            </main>
+          }
+        >
           <Routes>
             <Route path="/health" element={<HealthPage />} />
             <Route path="/admin" element={<AdminDashboard />} />

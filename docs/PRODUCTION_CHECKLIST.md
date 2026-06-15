@@ -1,0 +1,32 @@
+# Production Checklist
+
+- [ ] `npm ci` from a clean checkout.
+- [ ] `.env` not committed.
+- [ ] Runtime secrets injected by deployment platform.
+- [ ] `APP_URL=https://process.higroup.systems`.
+- [ ] `API_URL=/api/v1`.
+- [ ] `FRONTEND_URL=https://process.higroup.systems`.
+- [ ] `CORS_ORIGIN=https://process.higroup.systems`.
+- [ ] `COOKIE_DOMAIN=process.higroup.systems`.
+- [ ] `ENABLE_SWAGGER=false`.
+- [ ] `npm run format`.
+- [ ] `npm run lint`.
+- [ ] `npm run test`.
+- [ ] `npm run test:e2e`.
+- [ ] `npm run build`.
+- [ ] `npx prisma validate --config apps/api/prisma.config.ts`.
+- [ ] `npx prisma migrate status --config apps/api/prisma.config.ts`.
+- [ ] Database backup completed.
+- [ ] `npx prisma migrate deploy --config apps/api/prisma.config.ts`.
+- [ ] `npm run db:check --workspace @pda/api`.
+- [ ] `npm run db:seed-check --workspace @pda/api`.
+- [ ] `npm run db:integrity --workspace @pda/api`.
+- [ ] `COOKIE_SECURE=true`.
+- [ ] CORS `APP_URL` set to production web URL.
+- [ ] Vite dev server not exposed.
+- [ ] Swagger exposure reviewed.
+- [ ] Export storage path or S3/MinIO bucket configured.
+- [ ] Logs redacted and retained according to policy.
+- [ ] DNS `A process -> IP_DU_SERVEUR` configured.
+- [ ] Let's Encrypt certificate issued and renew dry-run passed.
+- [ ] `curl https://process.higroup.systems/api/v1/health` returns OK.

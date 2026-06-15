@@ -1,0 +1,14 @@
+{
+  "name": "@pda/tsconfig",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "files": [
+    "base.json"
+  ],
+  "scripts": {
+    "build": "echo \"No build for @pda/tsconfig\"",
+    "lint": "echo \"No lint for @pda/tsconfig\"",
+    "test": "echo \"No tests for @pda/tsconfig\""
+  }
+}

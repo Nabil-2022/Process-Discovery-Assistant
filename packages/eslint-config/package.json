@@ -1,0 +1,12 @@
+{
+  "name": "@pda/eslint-config",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "build": "echo \"No build for @pda/eslint-config yet\"",
+    "lint": "echo \"No lint for @pda/eslint-config yet\"",
+    "test": "echo \"No tests for @pda/eslint-config yet\""
+  }
+}

@@ -1,0 +1,14 @@
+.env
+.env.*
+!.env.example
+node_modules/
+dist/
+build/
+coverage/
+.turbo/
+.vite/
+*.log
+*.tsbuildinfo
+apps/api/src/generated/
+storage/
+storage/exports/

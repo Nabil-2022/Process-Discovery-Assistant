@@ -1,0 +1,49 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      APP_URL: https://process.higroup.systems
+      FRONTEND_URL: https://process.higroup.systems
+      CORS_ORIGIN: https://process.higroup.systems
+      API_URL: /api/v1
+      COOKIE_DOMAIN: process.higroup.systems
+      COOKIE_SECURE: 'true'
+      COOKIE_SAME_SITE: lax
+      ENABLE_SWAGGER: 'false'
+    volumes:
+      - exports_data:/app/storage/exports
+    ports:
+      - '127.0.0.1:3000:3000'
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -q --spider http://127.0.0.1:3000/api/v1/health || exit 1']
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        VITE_API_URL: /api/v1
+    ports:
+      - '127.0.0.1:8080:80'
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -q --spider http://127.0.0.1/health || exit 1']
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  exports_data:

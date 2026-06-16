@@ -1405,7 +1405,7 @@ input[type='checkbox'] {
 
 .landing-hero h1 {
   max-width: 760px;
-  font-size: clamp(44px, 6vw, 78px);
+  font-size: clamp(44px, 4.6vw, 62px);
   line-height: 0.98;
   letter-spacing: 0;
 }

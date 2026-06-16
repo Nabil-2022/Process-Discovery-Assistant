@@ -20,6 +20,9 @@ services:
       - exports_data:/app/storage/exports
     ports:
       - '127.0.0.1:8050:3000'
+    depends_on:
+      postgres:
+        condition: service_healthy
     restart: unless-stopped
     healthcheck:
       test: ['CMD-SHELL', 'wget -q --spider http://127.0.0.1:3000/api/v1/health || exit 1']

@@ -1,13 +1,19 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 
 const badges = [
-  'SaaS multi-tenant',
-  'RACI deterministe',
-  'BPMN 2.0',
-  'ISO 9001 ready',
-  'Conformite Maroc',
-  'Exports officiels',
-  'IA encadree',
+  { label: 'SaaS multi-tenant' },
+  { label: 'RACI deterministe' },
+  { label: 'BPMN 2.0' },
+  { label: 'ISO 9001 ready' },
+  {
+    label: 'Conformite Maroc',
+    law: 'Loi 55-19',
+    variant: 'morocco',
+    title:
+      'Referentiel visuel pour les processus concernes par les exigences marocaines, notamment la Loi 55-19.',
+  },
+  { label: 'Exports officiels' },
+  { label: 'IA encadree' },
 ];
 
 const problemPoints = [
@@ -157,14 +163,46 @@ const trustItems = [
 ];
 
 const productViews = [
-  'Dashboard tenant',
-  'Wizard',
-  'Atelier',
-  'RACI',
-  'BPMN premium',
-  'Procedure',
-  'Exports',
-  'Audit',
+  {
+    title: 'Dashboard tenant',
+    badge: 'Pilotage',
+    image: '/landing/landing-dashboard.png',
+  },
+  {
+    title: 'Wizard',
+    badge: 'Formalisation',
+    image: '/landing/landing-wizard.png',
+  },
+  {
+    title: 'Atelier',
+    badge: 'Controle',
+    image: '/landing/landing-workshop.png',
+  },
+  {
+    title: 'RACI',
+    badge: 'Responsabilites',
+    image: '/landing/landing-raci.png',
+  },
+  {
+    title: 'BPMN premium',
+    badge: 'Diagramme',
+    image: '/landing/landing-bpmn.png',
+  },
+  {
+    title: 'Procedure',
+    badge: 'Qualite',
+    image: '/landing/landing-procedure.png',
+  },
+  {
+    title: 'Exports',
+    badge: 'Livrables',
+    image: '/landing/landing-exports.png',
+  },
+  {
+    title: 'Audit',
+    badge: 'Tracabilite',
+    image: '/landing/landing-audit.png',
+  },
 ];
 
 const useCases = [
@@ -399,7 +437,14 @@ export function LandingPage() {
           </div>
           <div className="landing-badges" aria-label="Caracteristiques principales">
             {badges.map((badge) => (
-              <span key={badge}>{badge}</span>
+              <span
+                key={badge.label}
+                className={badge.variant === 'morocco' ? 'landing-badge--morocco' : undefined}
+                title={badge.title}
+              >
+                <span>{badge.label}</span>
+                {badge.law ? <small>{badge.law}</small> : null}
+              </span>
             ))}
           </div>
         </div>
@@ -533,15 +578,13 @@ export function LandingPage() {
           </p>
         </div>
         <div className="landing-showcase-grid">
-          {productViews.map((view, index) => (
-            <article key={view} className="landing-showcase-card">
+          {productViews.map((view) => (
+            <article key={view.title} className="landing-showcase-card">
               <div>
-                <span>{view}</span>
-                <strong>{index % 2 === 0 ? 'Pilotage' : 'Formalisation'}</strong>
+                <span>{view.title}</span>
+                <strong>{view.badge}</strong>
               </div>
-              <i />
-              <i />
-              <i />
+              <img src={view.image} alt={`Capture ${view.title} - Process Discovery Assistant`} />
             </article>
           ))}
         </div>

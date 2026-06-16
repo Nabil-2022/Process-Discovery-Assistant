@@ -13,6 +13,6 @@ import { PasswordService } from './services/password.service';
   imports: [JwtModule.register({}), PrismaModule],
   controllers: [AuthController],
   providers: [AuthService, PasswordService, AuthRateLimitService, JwtAuthGuard, AuthPolicyGuard],
-  exports: [AuthService, PasswordService, JwtAuthGuard, AuthPolicyGuard],
+  exports: [JwtModule, AuthService, PasswordService, JwtAuthGuard, AuthPolicyGuard],
 })
 export class AuthModule {}

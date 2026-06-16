@@ -10,5 +10,5 @@ coverage/
 *.log
 *.tsbuildinfo
 apps/api/src/generated/
-storage/
-storage/exports/
+/storage/
+/storage/exports/

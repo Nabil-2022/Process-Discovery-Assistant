@@ -1405,7 +1405,7 @@ function authHeaders() {
   const token = localStorage.getItem('pda_access_token');
   const grantId = localStorage.getItem('pda_support_grant_id');
   return {
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...(isUsableAccessToken(token) ? { Authorization: `Bearer ${token}` } : {}),
     ...(grantId ? { 'x-support-grant-id': grantId } : {}),
   };
 }
@@ -1435,20 +1435,68 @@ function params(filters: DirectionFilters) {
 
 export const tenantApi = {
   summary: (filters: DirectionFilters) =>
-    request<TenantSummary>(`/tenant/dashboard/summary?${params(filters)}`),
+    isUiPreviewMode()
+      ? Promise.resolve({
+          directions: 1,
+          processes: 1,
+          draft_processes: previewProcess.status === 'DRAFT' ? 1 : 0,
+          submitted_processes: 0,
+          correction_processes: 0,
+          validated_processes: 0,
+          average_completeness: Number(previewProcess.completenessScore),
+          pending_validations: 0,
+          critical_risks: 1,
+          automation_opportunities: 1,
+        })
+      : request<TenantSummary>(`/tenant/dashboard/summary?${params(filters)}`),
   progressByDirection: (filters: DirectionFilters) =>
-    request<DirectionProgress[]>(`/tenant/dashboard/progress-by-direction?${params(filters)}`),
+    isUiPreviewMode()
+      ? Promise.resolve([
+          {
+            id: previewDirection.id,
+            name: previewDirection.name,
+            code: previewDirection.code,
+            processes: previewDirection.processes,
+            validated_processes: previewDirection.validated_processes,
+            average_completeness: previewDirection.average_completeness,
+            campaign_progress: previewDirection.campaign_progress,
+            progress: previewDirection.progression,
+          },
+        ])
+      : request<DirectionProgress[]>(`/tenant/dashboard/progress-by-direction?${params(filters)}`),
   statusDistribution: (filters: DirectionFilters) =>
-    request<DistributionItem[]>(`/tenant/dashboard/process-status-distribution?${params(filters)}`),
+    isUiPreviewMode()
+      ? Promise.resolve([{ label: previewProcess.status, count: 1 }])
+      : request<DistributionItem[]>(
+          `/tenant/dashboard/process-status-distribution?${params(filters)}`,
+        ),
   categoryDistribution: (filters: DirectionFilters) =>
-    request<DistributionItem[]>(
-      `/tenant/dashboard/process-category-distribution?${params(filters)}`,
-    ),
-  risksByCriticality: () => request<DistributionItem[]>('/tenant/dashboard/risks-by-criticality'),
+    isUiPreviewMode()
+      ? Promise.resolve([{ label: previewProcess.category?.name ?? 'Metier', count: 1 }])
+      : request<DistributionItem[]>(
+          `/tenant/dashboard/process-category-distribution?${params(filters)}`,
+        ),
+  risksByCriticality: () =>
+    isUiPreviewMode()
+      ? Promise.resolve([{ label: 'Critique', count: 1 }])
+      : request<DistributionItem[]>('/tenant/dashboard/risks-by-criticality'),
   maturityOverview: (filters: DirectionFilters) =>
-    request<DistributionItem[]>(`/tenant/dashboard/maturity-overview?${params(filters)}`),
+    isUiPreviewMode()
+      ? Promise.resolve([{ label: 'Brouillon', count: Number(previewProcess.completenessScore) }])
+      : request<DistributionItem[]>(`/tenant/dashboard/maturity-overview?${params(filters)}`),
   actionsPriority: (filters: DirectionFilters) =>
-    request<PriorityAction[]>(`/tenant/dashboard/actions-priority?${params(filters)}`),
+    isUiPreviewMode()
+      ? Promise.resolve([
+          {
+            process_id: previewProcess.id,
+            process_name: previewProcess.name,
+            direction_name: previewDirection.name,
+            status: previewProcess.status,
+            completeness_score: Number(previewProcess.completenessScore),
+            priority: 'Haute',
+          },
+        ])
+      : request<PriorityAction[]>(`/tenant/dashboard/actions-priority?${params(filters)}`),
   directions: (filters: DirectionFilters) =>
     isUiPreviewMode()
       ? Promise.resolve({
@@ -2111,7 +2159,26 @@ function hasAnyPermission(codes: string[]) {
 
 function isUiPreviewMode() {
   return (
-    !localStorage.getItem('pda_access_token') &&
-    ['127.0.0.1', 'localhost'].includes(window.location.hostname)
+    ['127.0.0.1', 'localhost'].includes(window.location.hostname) &&
+    !isUsableAccessToken(localStorage.getItem('pda_access_token'))
   );
+}
+
+function isUsableAccessToken(token: string | null) {
+  if (!token) return false;
+  try {
+    const [, payload] = token.split('.');
+    if (!payload) return false;
+    const parsed = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/'))) as {
+      active_tenant_id?: string;
+      exp?: number;
+      token_type?: string;
+    };
+    if (parsed.token_type && parsed.token_type !== 'access') return false;
+    if (!parsed.active_tenant_id) return false;
+    if (parsed.exp && parsed.exp * 1000 <= Date.now()) return false;
+    return true;
+  } catch {
+    return false;
+  }
 }

@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 import { HealthPage } from './modules/health/HealthPage';
+import { LoginPage } from './modules/auth/LoginPage';
 import './styles.css';
 
 const queryClient = new QueryClient();
@@ -87,6 +88,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
         <Suspense fallback={<main className="tenant-shell">Chargement...</main>}>
           <Routes>
             <Route path="/health" element={<HealthPage />} />
+            <Route path="/login" element={<LoginPage />} />
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/tenant/dashboard" element={<TenantDashboard />} />
             <Route path="/tenant/directions" element={<TenantDirectionsPage />} />

@@ -1,6 +1,10 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as argon2 from 'argon2';
+import { promisify } from 'node:util';
+import { scrypt as scryptCallback, timingSafeEqual } from 'node:crypto';
+
+const scrypt = promisify(scryptCallback);
 
 @Injectable()
 export class PasswordService {
@@ -19,6 +23,14 @@ export class PasswordService {
   async verify(hash: string | null | undefined, password: string) {
     if (!hash) {
       return false;
+    }
+
+    if (hash.startsWith('scrypt:')) {
+      const [, salt, encoded] = hash.split(':');
+      if (!salt || !encoded) return false;
+      const expected = Buffer.from(encoded, 'hex');
+      const actual = (await scrypt(password, salt, expected.length)) as Buffer;
+      return expected.length === actual.length && timingSafeEqual(expected, actual);
     }
 
     return argon2.verify(hash, password);

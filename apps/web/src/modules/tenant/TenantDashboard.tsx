@@ -12,6 +12,7 @@ import {
   YAxis,
 } from 'recharts';
 
+import { BrandLogo } from '../../components/brand/BrandLogo';
 import { hasTenantAccess, tenantApi } from './api';
 
 const palette = ['#007aff', '#2f9e62', '#b7791f', '#d92d20', '#6e6e73'];
@@ -75,6 +76,7 @@ export function TenantDashboard() {
     return (
       <main className="tenant-shell">
         <section className="admin-empty">
+          <BrandLogo variant="full" />
           <p className="eyebrow">Dashboard tenant</p>
           <h1>Acces tenant refuse</h1>
           <p>Selectionnez un tenant actif ou utilisez un support access grant valide.</p>
@@ -214,6 +216,7 @@ export function TenantDashboard() {
 export function TenantHeader() {
   return (
     <header className="admin-header">
+      <BrandLogo variant="sidebar" />
       <div>
         <p className="eyebrow">Tenant MAP</p>
         <h1>Dashboard cartographie</h1>

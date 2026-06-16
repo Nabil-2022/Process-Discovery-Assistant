@@ -2,6 +2,7 @@ import { FormEvent, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 
+import { BrandLogo } from '../../components/brand/BrandLogo';
 import { adminApi, hasSuperAdminAccess } from './api';
 import { TenantsPage } from './TenantsPage';
 
@@ -17,6 +18,7 @@ export function AdminDashboard() {
     return (
       <main className="admin-shell">
         <section className="admin-empty">
+          <BrandLogo variant="full" />
           <p className="eyebrow">HiGroup SaaS</p>
           <h1>Acces administration refuse</h1>
           <p>Connectez-vous avec un compte super_admin pour afficher les donnees plateforme.</p>
@@ -28,6 +30,7 @@ export function AdminDashboard() {
   return (
     <main className="admin-shell">
       <header className="admin-header">
+        <BrandLogo variant="sidebar" />
         <div>
           <p className="eyebrow">HiGroup SaaS</p>
           <h1>Administration plateforme</h1>

@@ -1,6 +1,7 @@
 import { FormEvent, ReactNode, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
+import { BrandLogo } from '../../components/brand/BrandLogo';
 import {
   hasTenantAccess,
   MyActions,
@@ -346,6 +347,7 @@ function TenantActivityShell({ title, children }: { title: string; children: Rea
     return (
       <main className="tenant-shell">
         <section className="admin-empty">
+          <BrandLogo variant="full" />
           <p className="eyebrow">{title}</p>
           <h1>Acces tenant refuse</h1>
         </section>

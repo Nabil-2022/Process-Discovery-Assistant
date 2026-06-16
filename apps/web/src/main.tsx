@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
+import { BrandLogo } from './components/brand/BrandLogo';
 import { HealthPage } from './modules/health/HealthPage';
 import './styles.css';
 import './design-system.css';
@@ -89,6 +90,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
           fallback={
             <main className="tenant-shell">
               <section className="admin-empty">
+                <BrandLogo variant="login" />
                 <p className="eyebrow">Process Discovery Assistant</p>
                 <h1>Chargement</h1>
                 <div className="table-skeleton" aria-label="Chargement de l'interface" />

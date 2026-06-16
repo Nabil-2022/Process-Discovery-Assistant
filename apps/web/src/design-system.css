@@ -193,12 +193,104 @@ h3 {
 }
 
 .admin-header::before {
-  content: '';
-  width: 42px;
-  height: 42px;
+  content: none;
+}
+
+.brand-logo {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: 10px;
+  color: var(--pda-text);
+  text-decoration: none;
+}
+
+.brand-logo:hover {
+  color: var(--pda-text);
+}
+
+.brand-logo__mark {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  place-items: center;
   border-radius: 14px;
-  background: linear-gradient(135deg, rgba(0, 122, 255, 0.94), rgba(47, 158, 98, 0.86)), #007aff;
-  box-shadow: 0 14px 32px rgba(0, 122, 255, 0.22);
+  background: rgba(255, 255, 255, 0.54);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.95) inset,
+    0 10px 28px rgba(20, 22, 30, 0.08);
+}
+
+.brand-logo__mark img {
+  display: block;
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.brand-logo__wordmark {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+  line-height: 1.05;
+}
+
+.brand-logo__wordmark span {
+  color: var(--pda-text);
+  font-size: 1rem;
+  font-weight: 760;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.brand-logo__wordmark small {
+  color: var(--pda-text-muted);
+  font-size: 0.78rem;
+  font-weight: 640;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.brand-logo--compact .brand-logo__mark {
+  width: 40px;
+  height: 40px;
+  flex-basis: 40px;
+  border-radius: 13px;
+}
+
+.brand-logo--compact .brand-logo__mark img {
+  width: 28px;
+  height: 28px;
+}
+
+.brand-logo--login {
+  gap: 14px;
+}
+
+.brand-logo--login .brand-logo__mark {
+  width: 64px;
+  height: 64px;
+  flex-basis: 64px;
+  border-radius: 18px;
+}
+
+.brand-logo--login .brand-logo__mark img {
+  width: 46px;
+  height: 46px;
+}
+
+.brand-logo--login .brand-logo__wordmark span {
+  font-size: 1.35rem;
+}
+
+.brand-logo--login .brand-logo__wordmark small {
+  font-size: 0.86rem;
+}
+
+.brand-logo--sidebar {
+  min-height: 48px;
 }
 
 .admin-header > div {
@@ -798,6 +890,10 @@ input[type='checkbox'] {
     min-height: 0;
   }
 
+  .brand-logo--sidebar .brand-logo__wordmark {
+    display: none;
+  }
+
   .admin-header h1 {
     max-width: none;
   }
@@ -840,6 +936,17 @@ input[type='checkbox'] {
   .admin-header {
     border-radius: var(--pda-radius-lg);
     padding: 16px;
+  }
+
+  .brand-logo__mark {
+    width: 40px;
+    height: 40px;
+    flex-basis: 40px;
+  }
+
+  .brand-logo__mark img {
+    width: 28px;
+    height: 28px;
   }
 
   .admin-tabs {

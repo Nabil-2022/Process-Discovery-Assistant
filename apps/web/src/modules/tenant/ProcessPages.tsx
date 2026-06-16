@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { z } from 'zod';
 
+import { BrandLogo } from '../../components/brand/BrandLogo';
 import {
   AiGeneration,
   AiGenerationType,
@@ -3271,6 +3272,7 @@ function AccessDenied() {
   return (
     <main className="tenant-shell">
       <section className="admin-empty">
+        <BrandLogo variant="full" />
         <p className="eyebrow">Processus</p>
         <h1>Acces tenant refuse</h1>
       </section>

@@ -2,149 +2,149 @@ import { FormEvent, useEffect, useMemo, useState } from 'react';
 
 const badges = [
   { label: 'SaaS multi-tenant' },
-  { label: 'RACI deterministe' },
+  { label: 'RACI déterministe' },
   { label: 'BPMN 2.0' },
   { label: 'ISO 9001 ready' },
   {
-    label: 'Conformite Maroc',
+    label: 'Conformité Maroc',
     law: 'Loi 55-19',
     variant: 'morocco',
     title:
-      'Referentiel visuel pour les processus concernes par les exigences marocaines, notamment la Loi 55-19.',
+      'Référentiel visuel pour les processus concernés par les exigences marocaines, notamment la Loi 55-19.',
   },
   { label: 'Exports officiels' },
-  { label: 'IA encadree' },
+  { label: 'IA encadrée' },
 ];
 
 const problemPoints = [
-  'Processus disperses dans Excel, Word et les emails.',
-  'Responsabilites floues entre directions, controles et validations.',
-  'Procedures difficiles a maintenir et rarement a jour.',
-  'Cartographies complexes a consolider par direction.',
-  'Validations non tracees et audits longs a preparer.',
-  'Transformation digitale ralentie par le manque de referentiel fiable.',
-  'Opportunites d automatisation difficiles a prioriser.',
-  'Absence de vision unifiee sur les risques, KPI et controles.',
+  'Processus dispersés dans Excel, Word et les emails.',
+  'Responsabilités floues entre directions, contrôles et validations.',
+  'Procédures difficiles à maintenir et rarement à jour.',
+  'Cartographies complexes à consolider par direction.',
+  'Validations non tracées et audits longs à préparer.',
+  'Transformation digitale ralentie par le manque de référentiel fiable.',
+  'Opportunités d’automatisation difficiles à prioriser.',
+  'Absence de vision unifiée sur les risques, KPI et contrôles.',
 ];
 
 const steps = [
   'Recenser',
   'Formaliser',
-  'Controler',
+  'Contrôler',
   'Valider',
   'Publier',
   'Exporter',
-  'Ameliorer',
+  'Améliorer',
 ];
 
 const features = [
   {
     icon: 'CP',
     title: 'Cartographie des processus',
-    description: 'Structurez les processus par direction, domaine, responsable et criticite.',
-    benefit: 'Une vision consolidee et exploitable.',
+    description: 'Structurez les processus par direction, domaine, responsable et criticité.',
+    benefit: 'Une vision consolidée et exploitable.',
   },
   {
     icon: '11',
-    title: 'Wizard en 11 etapes',
-    description: 'Guide les equipes terrain dans une formalisation complete et homogene.',
-    benefit: 'Moins d oublis, plus de qualite.',
+    title: 'Wizard en 11 étapes',
+    description: 'Guide les équipes terrain dans une formalisation complète et homogène.',
+    benefit: 'Moins d’oublis, plus de qualité.',
   },
   {
     icon: '%',
-    title: 'Score de completude',
-    description: 'Mesure le niveau de maturite documentaire avant validation.',
-    benefit: 'Des priorites visibles immediatement.',
+    title: 'Score de complétude',
+    description: 'Mesure le niveau de maturité documentaire avant validation.',
+    benefit: 'Des priorités visibles immédiatement.',
   },
   {
     icon: 'R',
-    title: 'Matrice RACI deterministe',
-    description: 'Clarifie qui realise, approuve, consulte et informe.',
-    benefit: 'Responsabilites lisibles et partagees.',
+    title: 'Matrice RACI déterministe',
+    description: 'Clarifie qui réalise, approuve, consulte et informe.',
+    benefit: 'Responsabilités lisibles et partagées.',
   },
   {
     icon: 'B',
-    title: 'BPMN 2.0 deterministe',
-    description: 'Produit un flux BPMN coherent, lisible et exportable.',
+    title: 'BPMN 2.0 déterministe',
+    description: 'Produit un flux BPMN cohérent, lisible et exportable.',
     benefit: 'Compatible avec les pratiques BPM.',
   },
   {
     icon: 'Q',
-    title: 'Procedures qualite',
-    description: 'Transforme les informations terrain en procedure documentee.',
-    benefit: 'Livrables prets pour revue.',
+    title: 'Procédures qualité',
+    description: 'Transforme les informations terrain en procédure documentée.',
+    benefit: 'Livrables prêts pour revue.',
   },
   {
     icon: 'V',
     title: 'Workflow de validation',
-    description: 'Organise les etapes de revue, correction, approbation et publication.',
-    benefit: 'Gouvernance claire et tracable.',
+    description: 'Organise les étapes de revue, correction, approbation et publication.',
+    benefit: 'Gouvernance claire et traçable.',
   },
   {
     icon: 'A',
-    title: 'Audit et tracabilite',
-    description: 'Historise les actions, changements, validations et points de controle.',
-    benefit: 'Preparation aux audits facilitee.',
+    title: 'Audit et traçabilité',
+    description: 'Historise les actions, changements, validations et points de contrôle.',
+    benefit: 'Préparation aux audits facilitée.',
   },
   {
     icon: 'R!',
-    title: 'Risques et controles',
-    description: 'Relie risques, controles, activites et responsables.',
-    benefit: 'Meilleure maitrise operationnelle.',
+    title: 'Risques et contrôles',
+    description: 'Relie risques, contrôles, activités et responsables.',
+    benefit: 'Meilleure maîtrise opérationnelle.',
   },
   {
     icon: 'K',
     title: 'KPI',
-    description: 'Documente les indicateurs associes aux processus et activites.',
+    description: 'Documente les indicateurs associés aux processus et activités.',
     benefit: 'Pilotage plus factuel.',
   },
   {
     icon: '55',
-    title: 'Conformite Maroc / Loi 55-19',
-    description: 'Aide a structurer les demarches, documents et validations.',
-    benefit: 'Un cadre adapte aux organisations marocaines.',
+    title: 'Conformité Maroc / Loi 55-19',
+    description: 'Aide à structurer les démarches, documents et validations.',
+    benefit: 'Un cadre adapté aux organisations marocaines.',
   },
   {
     icon: 'PM',
     title: 'Process Mining readiness',
-    description: 'Prepare les donnees et evenements utiles aux analyses futures.',
-    benefit: 'Automatisation et optimisation mieux ciblees.',
+    description: 'Prépare les données et événements utiles aux analyses futures.',
+    benefit: 'Automatisation et optimisation mieux ciblées.',
   },
   {
     icon: 'IA',
-    title: 'Copilote IA encadre',
-    description: 'Assiste la redaction et l analyse sans devenir source de verite.',
+    title: 'Copilote IA encadré',
+    description: 'Assiste la rédaction et l’analyse sans devenir source de vérité.',
     benefit: 'Gain de temps avec validation humaine.',
   },
   {
     icon: 'EX',
     title: 'Exports officiels',
-    description: 'Genere PDF, Word, Excel, JSON et BPMN XML.',
+    description: 'Génère PDF, Word, Excel, JSON et BPMN XML.',
     benefit: 'Livrables partageables et archivables.',
   },
   {
     icon: 'N',
-    title: 'Notifications et taches',
+    title: 'Notifications et tâches',
     description: 'Rend visibles les actions attendues et les retards.',
     benefit: 'Moins de suivi manuel.',
   },
   {
     icon: 'S',
     title: 'Multi-tenant SaaS',
-    description: 'Segmente les organisations, roles, donnees et espaces de travail.',
-    benefit: 'Deploiement scalable et controle.',
+    description: 'Segmente les organisations, rôles, données et espaces de travail.',
+    benefit: 'Déploiement scalable et contrôlé.',
   },
 ];
 
 const differentiators = [
-  'IA assistee, jamais source de verite',
-  'Moteurs RACI et BPMN deterministes',
+  'IA assistée, jamais source de vérité',
+  'Moteurs RACI et BPMN déterministes',
   'Validation humaine obligatoire',
-  'Tracabilite complete des decisions',
-  'Conformite Maroc integree avec prudence',
-  'Preparation au process mining',
+  'Traçabilité complète des décisions',
+  'Conformité Maroc intégrée avec prudence',
+  'Préparation au process mining',
   'Exports documentaires officiels',
-  'Approche SaaS souveraine, dediee ou on-premise',
+  'Approche SaaS souveraine, dédiée ou on-premise',
 ];
 
 const trustItems = [
@@ -158,8 +158,8 @@ const trustItems = [
   'MinIO / S3',
   'Azure OpenAI optionnel',
   'Domaine client possible',
-  'Exports controles',
-  'Donnees metier structurees',
+  'Exports contrôlés',
+  'Données métier structurées',
 ];
 
 const productViews = [
@@ -175,12 +175,12 @@ const productViews = [
   },
   {
     title: 'Atelier',
-    badge: 'Controle',
+    badge: 'Contrôle',
     image: '/landing/landing-workshop.png',
   },
   {
     title: 'RACI',
-    badge: 'Responsabilites',
+    badge: 'Responsabilités',
     image: '/landing/landing-raci.png',
   },
   {
@@ -189,8 +189,8 @@ const productViews = [
     image: '/landing/landing-bpmn.png',
   },
   {
-    title: 'Procedure',
-    badge: 'Qualite',
+    title: 'Procédure',
+    badge: 'Qualité',
     image: '/landing/landing-procedure.png',
   },
   {
@@ -200,7 +200,7 @@ const productViews = [
   },
   {
     title: 'Audit',
-    badge: 'Tracabilite',
+    badge: 'Traçabilité',
     image: '/landing/landing-audit.png',
   },
 ];
@@ -208,23 +208,23 @@ const productViews = [
 const useCases = [
   {
     title: 'Administration publique',
-    text: 'Cartographier les demarches usagers et prioriser la simplification.',
+    text: 'Cartographier les démarches usagers et prioriser la simplification.',
   },
   {
     title: 'Banque / assurance',
-    text: 'Structurer les processus sensibles, clarifier les responsabilites et preparer les audits.',
+    text: 'Structurer les processus sensibles, clarifier les responsabilités et préparer les audits.',
   },
   {
     title: 'Entreprise publique',
-    text: 'Formaliser les procedures, tracer les validations et produire les livrables officiels.',
+    text: 'Formaliser les procédures, tracer les validations et produire les livrables officiels.',
   },
   {
-    title: 'Direction qualite',
-    text: 'Transformer les processus terrain en procedures exploitables.',
+    title: 'Direction qualité',
+    text: 'Transformer les processus terrain en procédures exploitables.',
   },
   {
     title: 'Direction transformation digitale',
-    text: 'Identifier les goulots, prioriser les automatisations et preparer le process mining.',
+    text: 'Identifier les goulots, prioriser les automatisations et préparer le process mining.',
   },
 ];
 
@@ -240,7 +240,7 @@ function updateMeta(name: string, content: string, attribute: 'name' | 'property
 
 function LandingMockup() {
   return (
-    <div className="landing-product" aria-label="Apercu produit">
+    <div className="landing-product" aria-label="Aperçu produit">
       <div className="landing-product__chrome">
         <span />
         <span />
@@ -267,15 +267,15 @@ function LandingMockup() {
           <div className="landing-product__metrics">
             <span>
               <strong>12</strong>
-              Activites
+              Activités
             </span>
             <span>
               <strong>4</strong>
-              Roles RACI
+              Rôles RACI
             </span>
             <span>
               <strong>8</strong>
-              Controles
+              Contrôles
             </span>
           </div>
           <div className="landing-product__flow">
@@ -288,7 +288,7 @@ function LandingMockup() {
             <span>Publication</span>
           </div>
           <div className="landing-product__table">
-            {['Expression du besoin', 'Controle budgetaire', 'Validation finale'].map(
+            {['Expression du besoin', 'Contrôle budgétaire', 'Validation finale'].map(
               (item, index) => (
                 <article key={item}>
                   <strong>{item}</strong>
@@ -337,7 +337,7 @@ function DemoForm() {
         <input name="email" type="email" autoComplete="email" required />
       </label>
       <label>
-        Telephone
+        Téléphone
         <input name="phone" type="tel" autoComplete="tel" />
       </label>
       <label>
@@ -346,7 +346,7 @@ function DemoForm() {
           <option>Administration publique</option>
           <option>Entreprise publique</option>
           <option>Banque / assurance</option>
-          <option>Telecoms</option>
+          <option>Télécoms</option>
           <option>Industrie</option>
           <option>Autre</option>
         </select>
@@ -355,19 +355,19 @@ function DemoForm() {
         Message
         <textarea
           name="message"
-          placeholder="Votre contexte, vos directions concernees, vos priorites..."
+          placeholder="Votre contexte, vos directions concernées, vos priorités…"
         />
       </label>
       <div className="landing-demo-form__actions">
         <button type="submit">Envoyer la demande</button>
-        <a className="button-link" href="mailto:contact@hi-group.fr">
-          contact@hi-group.fr
+        <a className="button-link" href="mailto:contact@higroup.systems">
+          contact@higroup.systems
         </a>
       </div>
       {submitted ? (
         <p className="landing-demo-form__success">
-          Votre demande sera traitee prochainement. La connexion email sera activee dans une
-          prochaine etape.
+          Votre demande sera traitée prochainement. La connexion email sera activée dans une
+          prochaine étape.
         </p>
       ) : null}
     </form>
@@ -378,9 +378,9 @@ export function LandingPage() {
   const currentYear = useMemo(() => new Date().getFullYear(), []);
 
   useEffect(() => {
-    const title = 'Process Discovery Assistant - Cartographie et gouvernance des processus';
+    const title = 'Process Discovery Assistant — Cartographie et gouvernance des processus';
     const description =
-      'Plateforme SaaS pour cartographier, documenter, valider et ameliorer les processus des administrations et grandes entreprises.';
+      'Plateforme SaaS pour cartographier, documenter, valider et améliorer les processus des administrations et grandes entreprises.';
     document.title = title;
     updateMeta('description', description);
     updateMeta('og:title', title, 'property');
@@ -409,11 +409,11 @@ export function LandingPage() {
           </strong>
         </a>
         <div>
-          <a href="#fonctionnalites">Fonctionnalites</a>
+          <a href="#fonctionnalites">Fonctionnalités</a>
           <a href="#secteurs">Secteurs</a>
-          <a href="#demo">Demo</a>
+          <a href="#demo">Démo</a>
           <a className="button-link" href="/login">
-            Acceder a la plateforme
+            Accéder à la plateforme
           </a>
         </div>
       </nav>
@@ -421,21 +421,21 @@ export function LandingPage() {
       <section className="landing-hero">
         <div className="landing-hero__content">
           <p className="eyebrow">Plateforme SaaS de gouvernance des processus</p>
-          <h1>Cartographiez, controlez et ameliorez vos processus en toute confiance.</h1>
+          <h1>Cartographiez, contrôlez et améliorez vos processus en toute confiance.</h1>
           <p>
-            Process Discovery Assistant aide les administrations et les grandes entreprises a
-            formaliser leurs processus, clarifier les responsabilites, generer RACI/BPMN, preparer
-            les audits et accelerer la transformation digitale.
+            Process Discovery Assistant aide les administrations et les grandes entreprises à
+            formaliser leurs processus, clarifier les responsabilités, générer RACI/BPMN, préparer
+            les audits et accélérer la transformation digitale.
           </p>
           <div className="landing-actions">
             <a className="landing-primary" href="#demo">
-              Demander une demo
+              Demander une démo
             </a>
             <a className="landing-secondary" href="#fonctionnalites">
-              Voir les fonctionnalites
+              Voir les fonctionnalités
             </a>
           </div>
-          <div className="landing-badges" aria-label="Caracteristiques principales">
+          <div className="landing-badges" aria-label="Caractéristiques principales">
             {badges.map((badge) => (
               <span
                 key={badge.label}
@@ -453,11 +453,11 @@ export function LandingPage() {
 
       <section className="landing-section landing-problem">
         <div className="landing-section__intro">
-          <p className="eyebrow">Le probleme</p>
-          <h2>Les processus sont souvent connus... mais rarement maitrises.</h2>
+          <p className="eyebrow">Le problème</p>
+          <h2>Les processus sont souvent connus… mais rarement maîtrisés.</h2>
           <p>
-            Dans beaucoup d organisations, la connaissance existe, mais elle reste fragmenteee,
-            difficile a maintenir et insuffisamment exploitable pour l audit, la qualite et la
+            Dans beaucoup d’organisations, la connaissance existe, mais elle reste fragmentée,
+            difficile à maintenir et insuffisamment exploitable pour l’audit, la qualité et la
             transformation digitale.
           </p>
         </div>
@@ -474,11 +474,11 @@ export function LandingPage() {
       <section className="landing-section">
         <div className="landing-section__intro">
           <p className="eyebrow">La solution</p>
-          <h2>Une plateforme unique pour passer du terrain au referentiel officiel.</h2>
+          <h2>Une plateforme unique pour passer du terrain au référentiel officiel.</h2>
           <p>
-            Le questionnaire structure, le wizard, l atelier de formalisation, le score, RACI, BPMN,
-            les risques, KPI, procedures, exports, validations, audit et notifications convergent
-            dans un meme espace de pilotage.
+            Le questionnaire structuré, le wizard, l’atelier de formalisation, le score, RACI, BPMN,
+            les risques, KPI, procédures, exports, validations, audit et notifications convergent
+            dans un même espace de pilotage.
           </p>
         </div>
         <div className="landing-steps">
@@ -493,8 +493,8 @@ export function LandingPage() {
 
       <section className="landing-section" id="fonctionnalites">
         <div className="landing-section__intro">
-          <p className="eyebrow">Fonctionnalites cles</p>
-          <h2>Tout le cycle de vie du processus, de la collecte a l export officiel.</h2>
+          <p className="eyebrow">Fonctionnalités clés</p>
+          <h2>Tout le cycle de vie du processus, de la collecte à l’export officiel.</h2>
         </div>
         <div className="landing-feature-grid">
           {features.map((feature) => (
@@ -506,43 +506,43 @@ export function LandingPage() {
       <section className="landing-section landing-audiences" id="secteurs">
         <article>
           <p className="eyebrow">Administrations publiques</p>
-          <h2>Pense pour les administrations et organismes publics.</h2>
+          <h2>Pensé pour les administrations et organismes publics.</h2>
           <p>
-            L outil facilite la structuration des demarches usagers, la simplification, la
-            digitalisation, la cartographie des risques, la tracabilite des validations et la
-            production d exports documentaires.
+            L’outil facilite la structuration des démarches usagers, la simplification, la
+            digitalisation, la cartographie des risques, la traçabilité des validations et la
+            production d’exports documentaires.
           </p>
           <small>
-            Il ne constitue pas un avis juridique et ne garantit pas a lui seul la conformite
-            reglementaire.
+            Il ne constitue pas un avis juridique et ne garantit pas à lui seul la conformité
+            réglementaire.
           </small>
         </article>
         <article>
-          <p className="eyebrow">Entreprises privees</p>
-          <h2>Adapte aux banques, assurances, telecoms et grandes entreprises.</h2>
+          <p className="eyebrow">Entreprises privées</p>
+          <h2>Adapté aux banques, assurances, télécoms et grandes entreprises.</h2>
           <p>
-            Les directions organisation, qualite, conformite, audit interne et transformation
-            digitale disposent d un referentiel partage pour industrialiser les procedures et
-            maitriser les risques operationnels.
+            Les directions organisation, qualité, conformité, audit interne et transformation
+            digitale disposent d’un référentiel partagé pour industrialiser les procédures et
+            maîtriser les risques opérationnels.
           </p>
         </article>
         <article>
           <p className="eyebrow">International</p>
-          <h2>Une approche generique, adaptable a chaque organisation.</h2>
+          <h2>Une approche générique, adaptable à chaque organisation.</h2>
           <p>
             Multi-tenant, templates configurables, workflows adaptables, exports standards, BPMN
-            2.0, deploiement cloud, souverain, dedie ou on-premise.
+            2.0, déploiement cloud, souverain, dédié ou on-premise.
           </p>
         </article>
       </section>
 
       <section className="landing-section landing-split">
         <div>
-          <p className="eyebrow">Differenciation</p>
-          <h2>Pourquoi Process Discovery Assistant est different.</h2>
+          <p className="eyebrow">Différenciation</p>
+          <h2>Pourquoi Process Discovery Assistant est différent.</h2>
           <p>
-            La plateforme combine rigueur documentaire, moteurs deterministes et assistance IA
-            encadree pour accelerer les chantiers sans affaiblir la validation humaine.
+            La plateforme combine rigueur documentaire, moteurs déterministes et assistance IA
+            encadrée pour accélérer les chantiers sans affaiblir la validation humaine.
           </p>
         </div>
         <div className="landing-check-list">
@@ -555,10 +555,10 @@ export function LandingPage() {
       <section className="landing-section landing-trust">
         <div className="landing-section__intro">
           <p className="eyebrow">Architecture de confiance</p>
-          <h2>Assez simple pour les metiers, assez structure pour rassurer les DSI.</h2>
+          <h2>Assez simple pour les métiers, assez structuré pour rassurer les DSI.</h2>
           <p>
-            Une architecture portable et controlee, concue pour des donnees metier structurees, des
-            droits differencies et une exploitation en environnement SaaS, dedie ou on-premise.
+            Une architecture portable et contrôlée, conçue pour des données métier structurées, des
+            droits différenciés et une exploitation en environnement SaaS, dédié ou on-premise.
           </p>
         </div>
         <div>
@@ -573,8 +573,8 @@ export function LandingPage() {
           <p className="eyebrow">Produit</p>
           <h2>Voir la plateforme en action.</h2>
           <p>
-            Des apercus stylises presentent les principaux espaces de travail sans exposer de
-            donnees sensibles.
+            Des aperçus stylisés présentent les principaux espaces de travail sans exposer de
+            données sensibles.
           </p>
         </div>
         <div className="landing-showcase-grid">
@@ -592,8 +592,8 @@ export function LandingPage() {
 
       <section className="landing-section">
         <div className="landing-section__intro">
-          <p className="eyebrow">Cas d usage</p>
-          <h2>Des parcours adaptes aux enjeux publics, prives et internationaux.</h2>
+          <p className="eyebrow">Cas d’usage</p>
+          <h2>Des parcours adaptés aux enjeux publics, privés et internationaux.</h2>
         </div>
         <div className="landing-usecase-grid">
           {useCases.map((useCase) => (
@@ -607,18 +607,19 @@ export function LandingPage() {
 
       <section className="landing-final" id="demo">
         <div>
-          <p className="eyebrow">Demander une demo</p>
-          <h2>Pret a transformer vos processus en referentiel maitrise ?</h2>
+          <p className="eyebrow">Demander une démo</p>
+          <h2>Prêt à transformer vos processus en référentiel maîtrisé ?</h2>
           <p>
-            Deploiement possible en SaaS, cloud souverain, instance dediee ou on-premise. Facilite l
-            alignement avec ISO 9001, la documentation, la tracabilite et la preparation aux audits.
+            Déploiement possible en SaaS, cloud souverain, instance dédiée ou on-premise. Facilite
+            l’alignement avec ISO 9001, la documentation, la traçabilité et la préparation aux
+            audits.
           </p>
           <div className="landing-actions">
-            <a className="landing-primary" href="mailto:contact@hi-group.fr">
+            <a className="landing-primary" href="mailto:contact@higroup.systems">
               Contacter HiGroup
             </a>
             <a className="landing-secondary" href="/login">
-              Acceder a la plateforme
+              Accéder à la plateforme
             </a>
           </div>
         </div>
@@ -628,16 +629,16 @@ export function LandingPage() {
       <footer className="landing-footer">
         <div>
           <strong>Process Discovery Assistant</strong>
-          <span>HiGroup - {currentYear}</span>
+          <span>HiGroup — {currentYear}</span>
         </div>
         <nav aria-label="Liens footer">
-          <a href="mailto:contact@hi-group.fr">contact@hi-group.fr</a>
-          <a href="/login">Login</a>
+          <a href="mailto:contact@higroup.systems">contact@higroup.systems</a>
+          <a href="/login">Connexion</a>
           <a href="/tenant/dashboard">Plateforme</a>
         </nav>
         <p>
-          Les fonctions de conformite facilitent la structuration, la documentation et la
-          tracabilite. Elles ne remplacent pas un audit, un avis juridique ou une validation
+          Les fonctions de conformité facilitent la structuration, la documentation et la
+          traçabilité. Elles ne remplacent pas un audit, un avis juridique ou une validation
           humaine.
         </p>
       </footer>

@@ -36,6 +36,7 @@ import {
   WorkshopVersions,
 } from './api';
 import { TenantHeader } from './TenantDashboard';
+import { PremiumBpmnViewer } from './bpmn-flow/PremiumBpmnViewer';
 
 const processSchema = z.object({
   name: z.string().min(2),
@@ -664,31 +665,35 @@ function RaciToolbar({
   processId: string;
 }) {
   return (
-    <div className="admin-toolbar raci-toolbar">
-      <Metric label="Score RACI" value={raci ? `${raci.qualityScore}%` : '-'} />
-      <Metric label="Statut" value={raci?.validationStatus ?? 'DRAFT'} />
-      <Metric label="Version" value={raci?.versionNumber ?? '-'} />
-      <button type="button" onClick={onGenerate} disabled={busy}>
-        Generer
-      </button>
-      <button type="button" onClick={onRecalculate} disabled={busy}>
-        Recalculer
-      </button>
-      <button type="button" onClick={onValidate} disabled={busy || !raci?.canValidate}>
-        Valider
-      </button>
-      <button type="button" onClick={onInvalidate} disabled={busy || !raci}>
-        Invalider
-      </button>
-      <a className="button-link" href={`/api/v1/tenant/processes/${processId}/raci/export.csv`}>
-        Export CSV
-      </a>
-      <Link className="button-link" to={`/tenant/processes/${processId}/wizard`}>
-        Wizard etape acteurs
-      </Link>
-      <Link className="button-link" to={`/tenant/processes/${processId}/workshop`}>
-        Atelier
-      </Link>
+    <div className="raci-toolbar">
+      <div className="raci-toolbar-metrics">
+        <Metric label="Score RACI" value={raci ? `${raci.qualityScore}%` : '-'} />
+        <Metric label="Statut" value={raci?.validationStatus ?? 'DRAFT'} />
+        <Metric label="Version" value={raci?.versionNumber ?? '-'} />
+      </div>
+      <div className="raci-toolbar-actions">
+        <button type="button" onClick={onGenerate} disabled={busy}>
+          Generer
+        </button>
+        <button type="button" onClick={onRecalculate} disabled={busy}>
+          Recalculer
+        </button>
+        <button type="button" onClick={onValidate} disabled={busy || !raci?.canValidate}>
+          Valider
+        </button>
+        <button type="button" onClick={onInvalidate} disabled={busy || !raci}>
+          Invalider
+        </button>
+        <a className="button-link" href={`/api/v1/tenant/processes/${processId}/raci/export.csv`}>
+          CSV
+        </a>
+        <Link className="button-link" to={`/tenant/processes/${processId}/wizard`}>
+          Wizard
+        </Link>
+        <Link className="button-link" to={`/tenant/processes/${processId}/workshop`}>
+          Atelier
+        </Link>
+      </div>
     </div>
   );
 }
@@ -701,12 +706,15 @@ function RaciMatrix({ raci }: { raci: RaciResult }) {
   }
   return (
     <div className="data-table-wrap raci-matrix">
+      <RaciLegend />
       <table className="data-table">
         <thead>
           <tr>
             <th>Activite</th>
             {raci.matrix.actors.map((actor) => (
-              <th key={actor.id}>{actor.name}</th>
+              <th key={actor.id}>
+                <span className="raci-actor-name">{actor.name}</span>
+              </th>
             ))}
           </tr>
         </thead>
@@ -720,9 +728,17 @@ function RaciMatrix({ raci }: { raci: RaciResult }) {
                 );
                 return (
                   <td key={actor.id}>
-                    <span className="raci-cell">
-                      {cell?.roles.map((role) => role[0]).join('/') || '-'}
-                    </span>
+                    <div className="raci-cell-group">
+                      {cell?.roles.length ? (
+                        cell.roles.map((role) => (
+                          <span className={`raci-cell ${raciRoleClass(role)}`} key={role}>
+                            {role[0]}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="raci-cell empty">-</span>
+                      )}
+                    </div>
                   </td>
                 );
               })}
@@ -732,6 +748,34 @@ function RaciMatrix({ raci }: { raci: RaciResult }) {
       </table>
     </div>
   );
+}
+
+function RaciLegend() {
+  return (
+    <div className="raci-legend" aria-label="Legende RACI">
+      <span>
+        <strong className="raci-cell responsible">R</strong> Realise
+      </span>
+      <span>
+        <strong className="raci-cell accountable">A</strong> Approuve
+      </span>
+      <span>
+        <strong className="raci-cell consulted">C</strong> Consulte
+      </span>
+      <span>
+        <strong className="raci-cell informed">I</strong> Informe
+      </span>
+    </div>
+  );
+}
+
+function raciRoleClass(role: string) {
+  const key = role.toLowerCase();
+  if (key.includes('responsible')) return 'responsible';
+  if (key.includes('accountable')) return 'accountable';
+  if (key.includes('consulted')) return 'consulted';
+  if (key.includes('informed')) return 'informed';
+  return 'informed';
 }
 
 function RaciIssuesPanel({ raci }: { raci: RaciResult }) {
@@ -781,6 +825,7 @@ function RaciHistoryPanel({
 export function ProcessBpmnPage() {
   const { id = '' } = useParams();
   const queryClient = useQueryClient();
+  const [view, setView] = useState<'premium' | 'xml'>('premium');
   const bpmn = useQuery({ queryKey: ['bpmn', id], queryFn: () => tenantApi.bpmn(id) });
   const history = useQuery({
     queryKey: ['bpmn-history', id],
@@ -830,7 +875,9 @@ export function ProcessBpmnPage() {
           />
           {bpmn.isLoading ? <p className="empty-inline">Chargement du BPMN...</p> : null}
           {bpmn.error ? <p className="error-text">{bpmn.error.message}</p> : null}
-          {bpmn.data ? <BpmnViewer bpmn={bpmn.data} /> : null}
+          {bpmn.data ? <BpmnViewTabs value={view} onChange={setView} /> : null}
+          {bpmn.data && view === 'premium' ? <PremiumBpmnViewer bpmn={bpmn.data} /> : null}
+          {bpmn.data && view === 'xml' ? <BpmnViewer bpmn={bpmn.data} /> : null}
         </article>
         {bpmn.data ? (
           <>
@@ -842,6 +889,33 @@ export function ProcessBpmnPage() {
         <BpmnHistoryPanel history={history.data ?? []} versions={versions.data ?? []} />
       </section>
     </main>
+  );
+}
+
+function BpmnViewTabs({
+  value,
+  onChange,
+}: {
+  value: 'premium' | 'xml';
+  onChange: (value: 'premium' | 'xml') => void;
+}) {
+  return (
+    <div className="bpmn-view-toggle" aria-label="Mode d'affichage BPMN">
+      <button
+        className={value === 'premium' ? 'active' : ''}
+        type="button"
+        onClick={() => onChange('premium')}
+      >
+        Vue premium
+      </button>
+      <button
+        className={value === 'xml' ? 'active' : ''}
+        type="button"
+        onClick={() => onChange('xml')}
+      >
+        Vue XML BPMN
+      </button>
+    </div>
   );
 }
 
@@ -863,35 +937,39 @@ function BpmnToolbar({
   busy: boolean;
 }) {
   return (
-    <div className="admin-toolbar raci-toolbar">
-      <Metric label="Statut BPMN" value={bpmn?.validationStatus ?? 'DRAFT'} />
-      <Metric label="Version" value={bpmn?.versionNumber ?? '-'} />
-      <Metric label="Blocages" value={bpmn?.blockingIssues.length ?? 0} />
-      <Metric label="Warnings" value={bpmn?.warnings.length ?? 0} />
-      <button type="button" onClick={onGenerate} disabled={busy}>
-        Generer
-      </button>
-      <button type="button" onClick={onRecalculate} disabled={busy}>
-        Recalculer
-      </button>
-      <button type="button" onClick={onValidate} disabled={busy || !bpmn?.canValidate}>
-        Valider
-      </button>
-      <button type="button" onClick={onInvalidate} disabled={busy || !bpmn}>
-        Invalider
-      </button>
-      <a className="button-link" href={`/api/v1/tenant/processes/${processId}/bpmn/export.xml`}>
-        XML
-      </a>
-      <a className="button-link" href={`/api/v1/tenant/processes/${processId}/bpmn/export.json`}>
-        JSON
-      </a>
-      <Link className="button-link" to={`/tenant/processes/${processId}/wizard`}>
-        Wizard
-      </Link>
-      <Link className="button-link" to={`/tenant/processes/${processId}/workshop`}>
-        Atelier
-      </Link>
+    <div className="raci-toolbar bpmn-toolbar">
+      <div className="raci-toolbar-metrics">
+        <Metric label="Statut BPMN" value={bpmn?.validationStatus ?? 'DRAFT'} />
+        <Metric label="Version" value={bpmn?.versionNumber ?? '-'} />
+        <Metric label="Blocages" value={bpmn?.blockingIssues.length ?? 0} />
+        <Metric label="Warnings" value={bpmn?.warnings.length ?? 0} />
+      </div>
+      <div className="raci-toolbar-actions">
+        <button type="button" onClick={onGenerate} disabled={busy}>
+          Generer
+        </button>
+        <button type="button" onClick={onRecalculate} disabled={busy}>
+          Recalculer
+        </button>
+        <button type="button" onClick={onValidate} disabled={busy || !bpmn?.canValidate}>
+          Valider
+        </button>
+        <button type="button" onClick={onInvalidate} disabled={busy || !bpmn}>
+          Invalider
+        </button>
+        <a className="button-link" href={`/api/v1/tenant/processes/${processId}/bpmn/export.xml`}>
+          XML
+        </a>
+        <a className="button-link" href={`/api/v1/tenant/processes/${processId}/bpmn/export.json`}>
+          JSON
+        </a>
+        <Link className="button-link" to={`/tenant/processes/${processId}/wizard`}>
+          Wizard
+        </Link>
+        <Link className="button-link" to={`/tenant/processes/${processId}/workshop`}>
+          Atelier
+        </Link>
+      </div>
     </div>
   );
 }
@@ -936,7 +1014,7 @@ function BpmnViewer({ bpmn }: { bpmn: BpmnResult }) {
             <g key={edge.id}>
               <path
                 className="bpmn-edge"
-                d={`M ${sourceCenter.x} ${sourceCenter.y} L ${targetCenter.x} ${targetCenter.y}`}
+                d={bpmnConnectorPath(sourceCenter, targetCenter)}
                 markerEnd="url(#bpmn-arrow)"
               />
               {edge.label ? (
@@ -998,22 +1076,30 @@ function BpmnNodeShape({ node }: { node: BpmnResult['bpmnJson']['nodes'][number]
         className={`bpmn-task ${node.type === 'userTask' ? 'user' : ''}`}
         x={node.position.x}
         y={node.position.y}
-        width="138"
-        height="64"
-        rx="8"
+        width="156"
+        height="70"
+        rx="12"
       />
-      <foreignObject x={node.position.x + 8} y={node.position.y + 8} width="122" height="48">
+      <foreignObject x={node.position.x + 12} y={node.position.y + 10} width="132" height="50">
         <div className="bpmn-task-label">{node.label}</div>
       </foreignObject>
     </g>
   );
 }
 
+function bpmnConnectorPath(source: { x: number; y: number }, target: { x: number; y: number }) {
+  const midX = source.x + (target.x - source.x) / 2;
+  if (Math.abs(source.y - target.y) < 10) {
+    return `M ${source.x} ${source.y} H ${target.x}`;
+  }
+  return `M ${source.x} ${source.y} H ${midX} V ${target.y} H ${target.x}`;
+}
+
 function centerOf(node: BpmnResult['bpmnJson']['nodes'][number]) {
   if (node.type === 'startEvent' || node.type === 'endEvent')
     return { x: node.position.x + 25, y: node.position.y + 25 };
   if (node.type === 'exclusiveGateway') return { x: node.position.x + 29, y: node.position.y + 29 };
-  return { x: node.position.x + 69, y: node.position.y + 32 };
+  return { x: node.position.x + 78, y: node.position.y + 35 };
 }
 
 function BpmnIssuesPanel({ bpmn }: { bpmn: BpmnResult }) {
@@ -1738,6 +1824,7 @@ function WorkshopBpmnTab({
   onValidate: () => void;
   onInvalidate: () => void;
 }) {
+  const [view, setView] = useState<'premium' | 'xml'>('premium');
   return (
     <article className="detail-panel">
       <WorkshopPanelState loading={loading} error={error} />
@@ -1752,7 +1839,8 @@ function WorkshopBpmnTab({
             onInvalidate={onInvalidate}
             busy={false}
           />
-          <BpmnViewer bpmn={bpmn} />
+          <BpmnViewTabs value={view} onChange={setView} />
+          {view === 'premium' ? <PremiumBpmnViewer bpmn={bpmn} /> : <BpmnViewer bpmn={bpmn} />}
           <BpmnIssuesPanel bpmn={bpmn} />
           <BpmnWarningsPanel bpmn={bpmn} />
           <BpmnRecommendationsPanel bpmn={bpmn} />

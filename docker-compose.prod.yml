@@ -16,6 +16,11 @@ services:
       COOKIE_SECURE: 'true'
       COOKIE_SAME_SITE: lax
       ENABLE_SWAGGER: 'false'
+      JWT_ACCESS_EXPIRES_IN: 15m
+      JWT_REFRESH_EXPIRES_IN: 30d
+      SMTP_HOST: mailpit
+      SMTP_PORT: '1025'
+      LOCAL_AUTH_BYPASS: 'true'
     volumes:
       - exports_data:/app/storage/exports
     ports:

@@ -41,6 +41,22 @@ export class AuthService {
   ) {}
 
   async login(dto: LoginDto, metadata: RequestMetadata) {
+    if (this.configService.get<boolean>('LOCAL_AUTH_BYPASS') !== false) {
+      return {
+        access_token: this.createDemoAccessToken(),
+        refresh_token: randomUUID(),
+        requires_tenant_selection: false,
+        tenants: [
+          {
+            tenant_id: 'demo-map-tenant',
+            membership_id: 'demo-map-membership',
+            slug: dto.tenant_slug ?? 'map-demo',
+            name: 'MAP Demonstration',
+          },
+        ],
+      };
+    }
+
     this.rateLimitService.assertAllowed('login', metadata.ip, dto.email);
     const email = dto.email.toLowerCase().trim();
     const user = await this.prisma.user.findUnique({
@@ -725,6 +741,38 @@ export class AuthService {
 
   private randomToken() {
     return randomBytes(48).toString('base64url');
+  }
+
+  private createDemoAccessToken() {
+    const header = this.base64Url({ alg: 'none', typ: 'JWT' });
+    const payload = this.base64Url({
+      token_type: 'access',
+      sub: 'demo-user',
+      session_id: 'demo-session',
+      active_tenant_id: 'demo-map-tenant',
+      membership_id: 'demo-map-membership',
+      global_roles: [],
+      tenant_roles: ['tenant_admin'],
+      permissions: [
+        'manage_directions',
+        'manage_users',
+        'create_process',
+        'update_process_working_copy',
+        'export_process',
+        'manage_ai_suggestions',
+      ],
+      exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 30,
+      jti: 'demo-token',
+    });
+    return `${header}.${payload}.demo`;
+  }
+
+  private base64Url(value: unknown) {
+    return Buffer.from(JSON.stringify(value))
+      .toString('base64')
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/, '');
   }
 
   private addDuration(date: Date, duration: string) {

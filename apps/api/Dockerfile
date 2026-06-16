@@ -27,10 +27,11 @@ COPY packages/eslint-config/package.json packages/eslint-config/package.json
 COPY packages/tsconfig/package.json packages/tsconfig/package.json
 COPY packages/types/package.json packages/types/package.json
 COPY packages/ui/package.json packages/ui/package.json
-RUN npm ci --omit=dev --ignore-scripts
+RUN npm ci --ignore-scripts
 COPY --from=build /app/apps/api/dist apps/api/dist
 COPY --from=build /app/apps/api/src/generated apps/api/dist/generated
 COPY --from=build /app/apps/api/src/generated apps/api/src/generated
 COPY --from=build /app/apps/api/prisma apps/api/prisma
+COPY --from=build /app/apps/api/prisma.config.ts apps/api/prisma.config.ts
 EXPOSE 3000
 CMD ["node", "apps/api/dist/main.js"]

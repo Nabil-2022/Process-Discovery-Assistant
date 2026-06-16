@@ -81,6 +81,9 @@ const TasksPage = lazy(() =>
 const MyActionsPage = lazy(() =>
   import('./modules/tenant/ActivityPages').then((module) => ({ default: module.MyActionsPage })),
 );
+const LandingPage = lazy(() =>
+  import('./modules/landing/LandingPage').then((module) => ({ default: module.LandingPage })),
+);
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
@@ -99,6 +102,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
           }
         >
           <Routes>
+            <Route path="/landing" element={<LandingPage />} />
             <Route path="/health" element={<HealthPage />} />
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/tenant/dashboard" element={<TenantDashboard />} />

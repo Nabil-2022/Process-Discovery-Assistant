@@ -19,7 +19,7 @@ services:
     volumes:
       - exports_data:/app/storage/exports
     ports:
-      - '8050:3000'
+      - '127.0.0.1:8050:3000'
     restart: unless-stopped
     healthcheck:
       test: ['CMD-SHELL', 'wget -q --spider http://127.0.0.1:3000/api/v1/health || exit 1']
@@ -34,7 +34,7 @@ services:
       args:
         VITE_API_URL: /api/v1
     ports:
-      - '80:80'
+      - '127.0.0.1:8056:80'
     restart: unless-stopped
     depends_on:
       api:

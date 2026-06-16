@@ -1,0 +1,7 @@
+process.higroup.systems {
+  encode gzip zstd
+
+  reverse_proxy /api/* 127.0.0.1:8050
+
+  reverse_proxy 127.0.0.1:8056
+}

@@ -6,7 +6,7 @@ services:
       POSTGRES_USER: process_discovery
       POSTGRES_PASSWORD: process_discovery
     ports:
-      - '8051:5432'
+      - '127.0.0.1:8051:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -22,8 +22,8 @@ services:
       MINIO_ROOT_USER: processdiscovery
       MINIO_ROOT_PASSWORD: processdiscovery
     ports:
-      - '8052:9000'
-      - '8053:9001'
+      - '127.0.0.1:8052:9000'
+      - '127.0.0.1:8053:9001'
     volumes:
       - minio_data:/data
     healthcheck:
@@ -35,8 +35,8 @@ services:
   mailpit:
     image: axllent/mailpit:v1.20
     ports:
-      - '8054:1025'
-      - '8055:8025'
+      - '127.0.0.1:8054:1025'
+      - '127.0.0.1:8055:8025'
     healthcheck:
       test: ['CMD', 'wget', '-q', '--spider', 'http://localhost:8025/livez']
       interval: 10s

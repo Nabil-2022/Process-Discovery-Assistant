@@ -8,12 +8,12 @@ services:
     environment:
       NODE_ENV: production
       PORT: 3000
-      APP_URL: https://process.higroup.systems
-      FRONTEND_URL: https://process.higroup.systems
-      CORS_ORIGIN: https://process.higroup.systems
-      API_URL: /api/v1
-      COOKIE_DOMAIN: process.higroup.systems
-      COOKIE_SECURE: 'true'
+      APP_URL: http://process.higroup.systems
+      FRONTEND_URL: http://process.higroup.systems
+      CORS_ORIGIN: http://process.higroup.systems,http://197.153.60.68
+      API_URL: http://197.153.60.68:8050/api/v1
+      COOKIE_DOMAIN: ''
+      COOKIE_SECURE: 'false'
       COOKIE_SAME_SITE: lax
       ENABLE_SWAGGER: 'false'
       JWT_ACCESS_EXPIRES_IN: 15m
@@ -24,7 +24,7 @@ services:
     volumes:
       - exports_data:/app/storage/exports
     ports:
-      - '127.0.0.1:8050:3000'
+      - '8050:3000'
     depends_on:
       postgres:
         condition: service_healthy
@@ -40,9 +40,9 @@ services:
       context: .
       dockerfile: apps/web/Dockerfile
       args:
-        VITE_API_URL: /api/v1
+        VITE_API_URL: http://197.153.60.68:8050/api/v1
     ports:
-      - '127.0.0.1:8056:80'
+      - '80:80'
     restart: unless-stopped
     depends_on:
       api:

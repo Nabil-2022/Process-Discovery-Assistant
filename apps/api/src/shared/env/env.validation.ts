@@ -20,7 +20,7 @@ const envSchema = z.object({
   APP_URL: z.string().url('APP_URL must be a valid URL'),
   API_URL: urlOrAbsolutePath,
   FRONTEND_URL: z.string().url().optional(),
-  CORS_ORIGIN: z.string().url().optional(),
+  CORS_ORIGIN: z.string().optional(),
   ENABLE_SWAGGER: z.coerce.boolean().optional().default(false),
   AI_PROVIDER: z.string().optional(),
   AI_API_KEY: z.string().optional(),

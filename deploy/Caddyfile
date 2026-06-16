@@ -3,5 +3,5 @@ process.higroup.systems {
 
   reverse_proxy /api/* 127.0.0.1:8050
 
-  reverse_proxy 127.0.0.1:8056
+  reverse_proxy 127.0.0.1:80
 }

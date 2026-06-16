@@ -17,8 +17,12 @@ async function bootstrap() {
   app.use(json({ limit: '1mb' }));
   app.use(urlencoded({ extended: false, limit: '1mb' }));
   app.use(cookieParser());
+  const corsOrigin = (process.env.CORS_ORIGIN || process.env.APP_URL || 'http://localhost:5173')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
   app.enableCors({
-    origin: process.env.CORS_ORIGIN || process.env.APP_URL || 'http://localhost:5173',
+    origin: corsOrigin.length === 1 ? corsOrigin[0] : corsOrigin,
     credentials: true,
   });
   app.useGlobalPipes(

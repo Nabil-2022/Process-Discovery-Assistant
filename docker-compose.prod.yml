@@ -21,6 +21,10 @@ services:
       SMTP_HOST: mailpit
       SMTP_PORT: '1025'
       LOCAL_AUTH_BYPASS: 'true'
+      SEED_SUPER_ADMIN_EMAIL: super.admin@example.test
+      SEED_SUPER_ADMIN_PASSWORD: ChangeMe12345!
+      SEED_MAP_TENANT_ADMIN_EMAIL: tenant.admin@example.test
+      SEED_MAP_TENANT_ADMIN_PASSWORD: ChangeMe12345!
     volumes:
       - exports_data:/app/storage/exports
     ports:

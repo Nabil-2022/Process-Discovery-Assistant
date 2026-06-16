@@ -29,6 +29,7 @@ COPY packages/types/package.json packages/types/package.json
 COPY packages/ui/package.json packages/ui/package.json
 RUN npm ci --omit=dev --ignore-scripts
 COPY --from=build /app/apps/api/dist apps/api/dist
+COPY --from=build /app/apps/api/src/generated apps/api/dist/generated
 COPY --from=build /app/apps/api/src/generated apps/api/src/generated
 COPY --from=build /app/apps/api/prisma apps/api/prisma
 EXPOSE 3000

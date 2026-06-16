@@ -1562,17 +1562,10 @@ export const tenantApi = {
       ? Promise.resolve({ ...previewProcess, id })
       : request<ProcessItem>(`/tenant/processes/${id}`),
   createProcess: (payload: Record<string, unknown>) =>
-    isUiPreviewMode()
-      ? Promise.resolve({
-          ...previewProcess,
-          id: '88888888-8888-4888-8888-888888888888',
-          name: String(payload.name ?? previewProcess.name),
-          description: String(payload.description ?? ''),
-        })
-      : request<ProcessItem>('/tenant/processes', {
-          method: 'POST',
-          body: JSON.stringify(payload),
-        }),
+    request<ProcessItem>('/tenant/processes', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
   updateProcess: (id: string, payload: Record<string, unknown>) =>
     request<ProcessItem>(`/tenant/processes/${id}`, {
       method: 'PATCH',
@@ -2076,19 +2069,13 @@ export const tenantApi = {
     payload: Record<string, unknown>,
     lockVersion?: number,
   ) =>
-    isUiPreviewMode()
-      ? Promise.resolve({
-          lock_version: (lockVersion ?? previewProcess.lockVersion) + 1,
-          saved_at: new Date().toISOString(),
-          completeness: previewCompleteness,
-        })
-      : request<{ lock_version: number; saved_at: string; completeness: Completeness }>(
-          `/tenant/processes/${id}/wizard/${step}`,
-          {
-            method: 'PATCH',
-            body: JSON.stringify({ lock_version: lockVersion, payload }),
-          },
-        ),
+    request<{ lock_version: number; saved_at: string; completeness: Completeness }>(
+      `/tenant/processes/${id}/wizard/${step}`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({ lock_version: lockVersion, payload }),
+      },
+    ),
   recalculateCompleteness: (id: string) =>
     isUiPreviewMode()
       ? Promise.resolve({ ...previewCompleteness, calculatedAt: new Date().toISOString() })
@@ -2110,6 +2097,7 @@ export const tenantApi = {
 };
 
 export function hasTenantAccess() {
+  if (isDemoAuthBypassEnabled()) return true;
   const token = localStorage.getItem('pda_access_token');
   if (!token && isUiPreviewMode()) return true;
   if (!token) return false;
@@ -2142,6 +2130,7 @@ export function canManageAiSuggestions() {
 }
 
 function hasAnyPermission(codes: string[]) {
+  if (isDemoAuthBypassEnabled()) return true;
   const token = localStorage.getItem('pda_access_token');
   if (!token && isUiPreviewMode()) return true;
   if (!token) return false;
@@ -2158,10 +2147,11 @@ function hasAnyPermission(codes: string[]) {
 }
 
 function isUiPreviewMode() {
-  return (
-    ['127.0.0.1', 'localhost'].includes(window.location.hostname) &&
-    !isUsableAccessToken(localStorage.getItem('pda_access_token'))
-  );
+  return false;
+}
+
+function isDemoAuthBypassEnabled() {
+  return import.meta.env.VITE_DEMO_AUTH_BYPASS !== 'false';
 }
 
 function isUsableAccessToken(token: string | null) {

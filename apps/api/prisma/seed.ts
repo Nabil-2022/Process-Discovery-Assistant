@@ -1,7 +1,14 @@
 import { promisify } from 'node:util';
 import { randomBytes, scrypt as scryptCallback } from 'node:crypto';
 
-import { MembershipStatus, TenantStatus, UserStatus } from '../src/generated/prisma';
+import {
+  DocumentStatus,
+  MembershipStatus,
+  RaciRole,
+  RiskLevel,
+  TenantStatus,
+  UserStatus,
+} from '../src/generated/prisma';
 import { createScriptPrismaClient } from './prisma-script-client';
 
 const prisma = createScriptPrismaClient();
@@ -320,6 +327,411 @@ async function seedDemoMapTenant(templateVersionId: string, frozenConfig: unknow
   return tenant;
 }
 
+async function seedDemoFinanceProcess() {
+  const tenant = await prisma.tenant.findUniqueOrThrow({ where: { slug: 'map-demo' } });
+
+  const direction = await prisma.direction.upsert({
+    where: {
+      tenantId_code: {
+        tenantId: tenant.id,
+        code: 'FIN',
+      },
+    },
+    create: {
+      tenantId: tenant.id,
+      name: 'Direction Finance',
+      code: 'FIN',
+      status: 'active',
+    },
+    update: {
+      name: 'Direction Finance',
+      status: 'active',
+    },
+  });
+
+  const category = await prisma.processCategory.upsert({
+    where: {
+      tenantId_code: {
+        tenantId: tenant.id,
+        code: 'METIER',
+      },
+    },
+    create: {
+      tenantId: tenant.id,
+      name: 'Metier',
+      code: 'METIER',
+      type: 'business',
+    },
+    update: {
+      name: 'Metier',
+      type: 'business',
+    },
+  });
+
+  const owner = await findOrCreateActor({
+    tenantId: tenant.id,
+    directionId: direction.id,
+    name: 'Responsable comptable',
+    title: 'Responsable comptable',
+    email: 'responsable.comptable@example.test',
+  });
+  const accountable = await findOrCreateActor({
+    tenantId: tenant.id,
+    directionId: direction.id,
+    name: 'Directeur Finance',
+    title: 'Directeur Finance',
+    email: 'directeur.finance@example.test',
+  });
+
+  const process = await prisma.process.upsert({
+    where: {
+      tenantId_code: {
+        tenantId: tenant.id,
+        code: 'FIN-CLOT-001',
+      },
+    },
+    create: {
+      tenantId: tenant.id,
+      directionId: direction.id,
+      categoryId: category.id,
+      processOwnerActorId: owner.id,
+      name: 'Cloture comptable mensuelle',
+      code: 'FIN-CLOT-001',
+      description: 'Processus de formalisation de la cloture mensuelle.',
+      objective: 'Produire des comptes mensuels fiables et valides.',
+      scope: 'Perimetre finance siege et filiales.',
+      triggerEvent: 'Fin de mois',
+      completenessScore: 76,
+    },
+    update: {
+      directionId: direction.id,
+      categoryId: category.id,
+      processOwnerActorId: owner.id,
+      name: 'Cloture comptable mensuelle',
+      description: 'Processus de formalisation de la cloture mensuelle.',
+      objective: 'Produire des comptes mensuels fiables et valides.',
+      scope: 'Perimetre finance siege et filiales.',
+      triggerEvent: 'Fin de mois',
+      completenessScore: 76,
+      deletedAt: null,
+    },
+  });
+
+  await clearDemoProcessChildren(tenant.id, process.id);
+
+  const collect = await prisma.processActivity.create({
+    data: {
+      tenantId: tenant.id,
+      processId: process.id,
+      code: 'COLLECTER',
+      name: 'Collecter les justificatifs',
+      inputText: 'Factures validees, releves bancaires, pieces comptables',
+      outputText: 'Dossier de cloture consolide',
+      sortOrder: 1,
+    },
+  });
+  const validate = await prisma.processActivity.create({
+    data: {
+      tenantId: tenant.id,
+      processId: process.id,
+      code: 'VALIDER',
+      name: 'Valider le dossier',
+      inputText: 'Dossier de cloture consolide',
+      outputText: 'Dossier valide pour production des etats financiers',
+      sortOrder: 2,
+    },
+  });
+
+  await prisma.processInput.create({
+    data: {
+      tenantId: tenant.id,
+      processId: process.id,
+      name: 'Factures validees',
+      source: 'ERP Finance',
+      sortOrder: 1,
+    },
+  });
+  await prisma.processOutput.create({
+    data: {
+      tenantId: tenant.id,
+      processId: process.id,
+      name: 'Etats financiers mensuels',
+      destination: 'Direction Finance',
+      sortOrder: 1,
+    },
+  });
+  await prisma.processTransition.create({
+    data: {
+      tenantId: tenant.id,
+      processId: process.id,
+      fromActivityId: collect.id,
+      toActivityId: validate.id,
+      label: 'Dossier pret',
+      sortOrder: 1,
+    },
+  });
+
+  for (const activity of [collect, validate]) {
+    await prisma.processActorRole.createMany({
+      data: [
+        {
+          tenantId: tenant.id,
+          processId: process.id,
+          activityId: activity.id,
+          actorId: owner.id,
+          raciRole: RaciRole.RESPONSIBLE,
+        },
+        {
+          tenantId: tenant.id,
+          processId: process.id,
+          activityId: activity.id,
+          actorId: accountable.id,
+          raciRole: RaciRole.ACCOUNTABLE,
+        },
+      ],
+    });
+  }
+
+  await prisma.kpi.create({
+    data: {
+      tenantId: tenant.id,
+      processId: process.id,
+      ownerActorId: owner.id,
+      name: 'Delai de cloture',
+      objective: 'Reduire le delai de production des etats mensuels.',
+      definition: 'Nombre de jours entre fin de mois et validation du dossier.',
+      unit: 'jours',
+      frequency: 'mensuelle',
+      target: '4 jours',
+    },
+  });
+
+  const risk = await prisma.risk.create({
+    data: {
+      tenantId: tenant.id,
+      processId: process.id,
+      ownerActorId: owner.id,
+      description: 'Risque de delai non maitrise pour une procedure usager',
+      category: 'Audit public',
+      riskFamily: 'Conformite',
+      inherentScore: 12,
+      residualScore: 6,
+      inherentLevel: RiskLevel.HIGH,
+      residualLevel: RiskLevel.MEDIUM,
+      auditRelevance: 'Preparation audit interne et externe',
+      courtOfAccountsRelevance: true,
+    },
+  });
+  const control = await prisma.control.create({
+    data: {
+      tenantId: tenant.id,
+      ownerActorId: accountable.id,
+      name: 'Revue mensuelle du dossier de cloture',
+      description: 'Controle de coherence et validation formelle avant diffusion.',
+      controlType: 'review',
+      frequency: 'mensuelle',
+    },
+  });
+  await prisma.riskControl.create({
+    data: {
+      tenantId: tenant.id,
+      riskId: risk.id,
+      controlId: control.id,
+      coverage: 'partielle',
+    },
+  });
+
+  await prisma.painPoint.create({
+    data: {
+      tenantId: tenant.id,
+      processId: process.id,
+      description: 'Relances manuelles',
+      impact: 'Risque de retard et manque de tracabilite',
+      priority: 'high',
+    },
+  });
+  await prisma.automationNeed.create({
+    data: {
+      tenantId: tenant.id,
+      processId: process.id,
+      activityId: collect.id,
+      description: 'Rapprochement automatique',
+      expectedGain: 'Reduction des relances et controles manuels',
+      complexity: 'Moyenne',
+      priority: 'high',
+    },
+  });
+
+  const application = await prisma.application.upsert({
+    where: {
+      tenantId_code: {
+        tenantId: tenant.id,
+        code: 'ERP-FIN',
+      },
+    },
+    create: {
+      tenantId: tenant.id,
+      name: 'ERP Finance',
+      code: 'ERP-FIN',
+      owner: 'Direction Finance',
+      criticality: RiskLevel.HIGH,
+    },
+    update: {
+      name: 'ERP Finance',
+      owner: 'Direction Finance',
+      criticality: RiskLevel.HIGH,
+      deletedAt: null,
+    },
+  });
+  await prisma.processApplication.create({
+    data: {
+      tenantId: tenant.id,
+      processId: process.id,
+      applicationId: application.id,
+      usage: 'Source des pieces comptables et suivi de cloture.',
+    },
+  });
+
+  const document = await prisma.document.create({
+    data: {
+      tenantId: tenant.id,
+      reference: `PROC-FIN-CLOT-${process.id.slice(0, 8)}`,
+      title: 'Procedure de cloture',
+      documentType: 'procedure',
+      status: DocumentStatus.DRAFT,
+      version: '1.0',
+      ownerActorId: owner.id,
+    },
+  });
+  await prisma.processDocument.create({
+    data: {
+      tenantId: tenant.id,
+      processId: process.id,
+      documentId: document.id,
+      usageType: 'procedure',
+    },
+  });
+
+  await prisma.moroccoProcessCompliance.upsert({
+    where: { processId: process.id },
+    create: {
+      tenantId: tenant.id,
+      processId: process.id,
+      isUserFacingProcess: true,
+      law5519Applicable: true,
+      administrativeProcedureType: 'Demande administrative',
+      userCategory: 'Usager entreprise',
+      currentChannel: 'Physique',
+      targetChannel: 'Digital',
+      simplificationPriority: 'Haute',
+      digitalizationPriority: 'Haute',
+      currentProcessingTimeDays: 12,
+      targetProcessingTimeDays: 4,
+      requiredDocumentsCount: 6,
+      requestedCopiesCount: 2,
+      physicalVisitsRequired: 1,
+      feesRequired: false,
+      legalReference: 'Loi 55-19',
+      procedureOwnerEntity: 'Direction Finance',
+      observations:
+        'Cet outil facilite la structuration et la tracabilite sans garantir la conformite.',
+    },
+    update: {
+      isUserFacingProcess: true,
+      law5519Applicable: true,
+      administrativeProcedureType: 'Demande administrative',
+      userCategory: 'Usager entreprise',
+      currentChannel: 'Physique',
+      targetChannel: 'Digital',
+      simplificationPriority: 'Haute',
+      digitalizationPriority: 'Haute',
+      currentProcessingTimeDays: 12,
+      targetProcessingTimeDays: 4,
+      requiredDocumentsCount: 6,
+      requestedCopiesCount: 2,
+      physicalVisitsRequired: 1,
+      feesRequired: false,
+      legalReference: 'Loi 55-19',
+      procedureOwnerEntity: 'Direction Finance',
+      observations:
+        'Cet outil facilite la structuration et la tracabilite sans garantir la conformite.',
+    },
+  });
+
+  await prisma.auditLog.create({
+    data: {
+      tenantId: tenant.id,
+      action: 'seed_demo_finance_process',
+      resourceType: 'processes',
+      resourceId: process.id,
+      result: 'success',
+      metadata: { code: process.code },
+    },
+  });
+}
+
+async function findOrCreateActor(data: {
+  tenantId: string;
+  directionId: string;
+  name: string;
+  title: string;
+  email: string;
+}) {
+  const actor = await prisma.actor.findFirst({
+    where: {
+      tenantId: data.tenantId,
+      email: data.email,
+      deletedAt: null,
+    },
+  });
+  if (actor) {
+    return prisma.actor.update({
+      where: { id: actor.id },
+      data: {
+        directionId: data.directionId,
+        name: data.name,
+        title: data.title,
+      },
+    });
+  }
+  return prisma.actor.create({ data });
+}
+
+async function clearDemoProcessChildren(tenantId: string, processId: string) {
+  const risks = await prisma.risk.findMany({
+    where: { tenantId, processId },
+    select: { id: true },
+  });
+  const riskIds = risks.map((risk) => risk.id);
+  if (riskIds.length) {
+    await prisma.riskControl.deleteMany({ where: { tenantId, riskId: { in: riskIds } } });
+  }
+  await prisma.processActorRole.deleteMany({ where: { tenantId, processId } });
+  await prisma.processTransition.deleteMany({ where: { tenantId, processId } });
+  await prisma.processActivity.deleteMany({ where: { tenantId, processId } });
+  await prisma.processInput.deleteMany({ where: { tenantId, processId } });
+  await prisma.processOutput.deleteMany({ where: { tenantId, processId } });
+  await prisma.kpi.deleteMany({ where: { tenantId, processId } });
+  await prisma.risk.deleteMany({ where: { tenantId, processId } });
+  await prisma.painPoint.deleteMany({ where: { tenantId, processId } });
+  await prisma.automationNeed.deleteMany({ where: { tenantId, processId } });
+  await prisma.processApplication.deleteMany({ where: { tenantId, processId } });
+  await prisma.processDocument.deleteMany({ where: { tenantId, processId } });
+  await prisma.document.deleteMany({
+    where: {
+      tenantId,
+      title: 'Procedure de cloture',
+      reference: { startsWith: 'PROC-FIN-CLOT-' },
+    },
+  });
+  await prisma.control.deleteMany({
+    where: {
+      tenantId,
+      name: 'Revue mensuelle du dossier de cloture',
+    },
+  });
+}
+
 async function seedOptionalSuperAdmin() {
   const email = process.env.SEED_SUPER_ADMIN_EMAIL;
   const password = process.env.SEED_SUPER_ADMIN_PASSWORD;
@@ -429,6 +841,7 @@ async function main() {
   await seedFeatures();
   const { version, configuration } = await seedMapTemplate();
   await seedDemoMapTenant(version.id, configuration);
+  await seedDemoFinanceProcess();
   await seedOptionalSuperAdmin();
   await seedOptionalMapTenantAdmin();
 }

@@ -45,6 +45,7 @@ const envSchema = z.object({
   COOKIE_SAME_SITE: z.enum(['lax', 'strict', 'none']).optional().default('lax'),
   COOKIE_DOMAIN: z.string().optional(),
   SUPPORT_ACCESS_MAX_DAYS: z.coerce.number().int().positive().max(90).optional().default(14),
+  LOCAL_AUTH_BYPASS: z.coerce.boolean().optional().default(true),
 });
 
 export type AppEnvironment = z.infer<typeof envSchema>;

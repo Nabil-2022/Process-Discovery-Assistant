@@ -8,6 +8,7 @@
     "build": "tsc -p tsconfig.build.json",
     "lint": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
+    "seed": "tsx prisma/seed.ts",
     "prisma:format": "prisma format",
     "prisma:validate": "prisma validate",
     "prisma:generate": "prisma generate",

@@ -11,6 +11,7 @@ RUN npm ci
 
 FROM node:22-alpine AS build
 WORKDIR /app
+ENV DATABASE_URL=postgresql://process_discovery:process_discovery@postgres:5432/process_discovery_local?schema=process_discovery
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npm run prisma:generate --workspace @pda/api

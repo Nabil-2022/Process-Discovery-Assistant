@@ -11,7 +11,8 @@ export class AzureOpenAiProvider implements AiProvider {
     const endpoint = this.config.get<string>('AZURE_OPENAI_ENDPOINT');
     const deployment = this.config.get<string>('AZURE_OPENAI_DEPLOYMENT');
     const apiVersion = this.config.get<string>('AZURE_OPENAI_API_VERSION') ?? '2024-02-15-preview';
-    const apiKey = this.config.get<string>('AI_API_KEY');
+    const apiKey =
+      this.config.get<string>('AZURE_OPENAI_API_KEY') ?? this.config.get<string>('AI_API_KEY');
     if (!endpoint || !deployment || !apiKey) {
       throw new ServiceUnavailableException('Provider Azure OpenAI non configure.');
     }

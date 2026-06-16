@@ -1070,6 +1070,87 @@ p {
   padding: 12px;
 }
 
+.ai-generation-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.ai-suggestion-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+  align-items: start;
+}
+
+.ai-suggestion-card {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.ai-suggestion-card h3 {
+  min-width: 0;
+  font-size: 16px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.ai-suggestion-status {
+  justify-self: start;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ai-suggestion-description {
+  margin: 2px 0 4px;
+  color: #475569;
+  line-height: 1.5;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.ai-suggestion-meta {
+  display: grid;
+  min-width: 0;
+}
+
+.ai-suggestion-meta .key-value {
+  display: grid;
+  grid-template-columns: minmax(90px, 0.45fr) minmax(0, 1fr);
+  align-items: start;
+}
+
+.ai-suggestion-meta .key-value strong {
+  min-width: 0;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.ai-modify-fields textarea {
+  width: 100%;
+  min-height: 130px;
+  resize: vertical;
+}
+
+.ai-suggestion-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #e4ebf2;
+}
+
+.ai-suggestion-actions button {
+  min-height: 34px;
+  height: auto;
+  padding: 7px 10px;
+  white-space: normal;
+  line-height: 1.15;
+}
+
 @keyframes shimmer {
   from {
     background-position: -220px 0;
@@ -1136,5 +1217,14 @@ p {
 
   .tenant-form.compact {
     grid-template-columns: 1fr;
+  }
+
+  .ai-generation-actions,
+  .ai-suggestion-meta .key-value {
+    grid-template-columns: 1fr;
+  }
+
+  .ai-suggestion-meta .key-value strong {
+    text-align: left;
   }
 }

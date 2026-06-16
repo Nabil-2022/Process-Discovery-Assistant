@@ -107,6 +107,6 @@ export class JwtAuthGuard implements CanActivate {
       return false;
     }
 
-    return this.configService.get<boolean>('LOCAL_AUTH_BYPASS') !== false;
+    return this.configService.get<boolean>('LOCAL_AUTH_BYPASS') === true;
   }
 }

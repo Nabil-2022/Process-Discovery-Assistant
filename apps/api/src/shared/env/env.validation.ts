@@ -24,6 +24,7 @@ const envSchema = z.object({
   ENABLE_SWAGGER: z.coerce.boolean().optional().default(false),
   AI_PROVIDER: z.string().optional(),
   AI_API_KEY: z.string().optional(),
+  AZURE_OPENAI_API_KEY: z.string().optional(),
   AZURE_OPENAI_ENDPOINT: optionalUrl,
   AZURE_OPENAI_DEPLOYMENT: z.string().optional(),
   AZURE_OPENAI_API_VERSION: z.string().optional(),
@@ -45,7 +46,7 @@ const envSchema = z.object({
   COOKIE_SAME_SITE: z.enum(['lax', 'strict', 'none']).optional().default('lax'),
   COOKIE_DOMAIN: z.string().optional(),
   SUPPORT_ACCESS_MAX_DAYS: z.coerce.number().int().positive().max(90).optional().default(14),
-  LOCAL_AUTH_BYPASS: z.coerce.boolean().optional().default(true),
+  LOCAL_AUTH_BYPASS: z.coerce.boolean().optional().default(false),
 });
 
 export type AppEnvironment = z.infer<typeof envSchema>;

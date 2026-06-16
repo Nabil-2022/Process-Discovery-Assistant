@@ -579,7 +579,7 @@ export class TenantService {
   }
 
   private assertCanWrite(ctx: TenantAccessContext) {
-    if (process.env.LOCAL_AUTH_BYPASS !== 'false') return;
+    if (process.env.LOCAL_AUTH_BYPASS === 'true') return;
     if (
       ctx.isSupportAccess ||
       !writePermissions.some((permission) => ctx.permissions.includes(permission))

@@ -2136,7 +2136,7 @@ function AiCopilotTab({
         {error?.message.includes('Copilote IA non') ? (
           <p className="error-text">Copilote IA non active pour ce tenant</p>
         ) : null}
-        <div className="wizard-actions">
+        <div className="ai-generation-actions">
           <select
             value={aiType}
             onChange={(event) => onAiTypeChange(event.target.value as AiGenerationType)}
@@ -2190,23 +2190,27 @@ function AiCopilotTab({
         {!suggestions.length && !loading ? (
           <p className="empty-inline">Aucune suggestion IA.</p>
         ) : null}
-        <div className="procedure-sections">
+        <div className="procedure-sections ai-suggestion-grid">
           {suggestions.map((suggestion) => (
-            <section key={suggestion.id}>
+            <section key={suggestion.id} className="ai-suggestion-card">
               <h3>{String(suggestion.content.title ?? suggestion.suggestionType)}</h3>
-              <span className="status-badge">{suggestion.status}</span>
-              <p className="empty-inline">{String(suggestion.content.description ?? '')}</p>
-              <KeyValue label="Type" value={suggestion.suggestionType} />
-              <KeyValue label="Priorite" value={String(suggestion.content.priority ?? '-')} />
-              <KeyValue label="Provider" value="Voir historique generation" />
-              <KeyValue label="Date" value={new Date(suggestion.createdAt).toLocaleString()} />
+              <span className="status-badge ai-suggestion-status">{suggestion.status}</span>
+              <p className="empty-inline ai-suggestion-description">
+                {String(suggestion.content.description ?? '')}
+              </p>
+              <div className="ai-suggestion-meta">
+                <KeyValue label="Type" value={suggestion.suggestionType} />
+                <KeyValue label="Priorite" value={String(suggestion.content.priority ?? '-')} />
+                <KeyValue label="Provider" value="Voir historique generation" />
+                <KeyValue label="Date" value={new Date(suggestion.createdAt).toLocaleString()} />
+              </div>
               {modifyId === suggestion.id ? (
-                <div className="wizard-fields">
+                <div className="wizard-fields ai-modify-fields">
                   <textarea
                     value={modifyText}
                     onChange={(event) => onModifyTextChange(event.target.value)}
                   />
-                  <div className="wizard-actions">
+                  <div className="ai-suggestion-actions">
                     <button
                       type="button"
                       onClick={() => onSaveModify(suggestion.id)}
@@ -2220,7 +2224,7 @@ function AiCopilotTab({
                   </div>
                 </div>
               ) : null}
-              <div className="wizard-actions">
+              <div className="ai-suggestion-actions">
                 <button
                   type="button"
                   onClick={() => onAccept(suggestion.id)}

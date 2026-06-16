@@ -291,6 +291,26 @@ async function seedDemoMapTenant(templateVersionId: string, frozenConfig: unknow
     },
   });
 
+  const featureRecords = await prisma.feature.findMany();
+  for (const feature of featureRecords) {
+    await prisma.tenantFeature.upsert({
+      where: {
+        tenantId_featureId: {
+          tenantId: tenant.id,
+          featureId: feature.id,
+        },
+      },
+      create: {
+        tenantId: tenant.id,
+        featureId: feature.id,
+        enabled: true,
+      },
+      update: {
+        enabled: true,
+      },
+    });
+  }
+
   for (const [index, name] of mapDirections.entries()) {
     const code = codeFromName(name);
     await prisma.direction.upsert({

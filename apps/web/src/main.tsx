@@ -3,9 +3,11 @@ import ReactDOM from 'react-dom/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
+import { BrandLogo } from './components/brand/BrandLogo';
 import { HealthPage } from './modules/health/HealthPage';
 import { LoginPage } from './modules/auth/LoginPage';
 import './styles.css';
+import './design-system.css';
 
 const queryClient = new QueryClient();
 const App = lazy(() => import('./modules/app/App').then((module) => ({ default: module.App })));
@@ -80,13 +82,28 @@ const TasksPage = lazy(() =>
 const MyActionsPage = lazy(() =>
   import('./modules/tenant/ActivityPages').then((module) => ({ default: module.MyActionsPage })),
 );
+const LandingPage = lazy(() =>
+  import('./modules/landing/LandingPage').then((module) => ({ default: module.LandingPage })),
+);
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <Suspense fallback={<main className="tenant-shell">Chargement...</main>}>
+        <Suspense
+          fallback={
+            <main className="tenant-shell">
+              <section className="admin-empty">
+                <BrandLogo variant="login" />
+                <p className="eyebrow">Process Discovery Assistant</p>
+                <h1>Chargement</h1>
+                <div className="table-skeleton" aria-label="Chargement de l'interface" />
+              </section>
+            </main>
+          }
+        >
           <Routes>
+            <Route path="/landing" element={<LandingPage />} />
             <Route path="/health" element={<HealthPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/admin" element={<AdminDashboard />} />

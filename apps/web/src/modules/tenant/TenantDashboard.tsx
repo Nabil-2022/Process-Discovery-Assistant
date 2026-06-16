@@ -12,9 +12,10 @@ import {
   YAxis,
 } from 'recharts';
 
+import { BrandLogo } from '../../components/brand/BrandLogo';
 import { hasTenantAccess, tenantApi } from './api';
 
-const palette = ['#1f9d8a', '#315f8c', '#d97706', '#b91c1c', '#64748b'];
+const palette = ['#007aff', '#2f9e62', '#b7791f', '#d92d20', '#6e6e73'];
 
 export function TenantDashboard() {
   const [filters, setFilters] = useState({ period: '30d', process_status: '', campaign_id: '' });
@@ -75,6 +76,7 @@ export function TenantDashboard() {
     return (
       <main className="tenant-shell">
         <section className="admin-empty">
+          <BrandLogo variant="full" />
           <p className="eyebrow">Dashboard tenant</p>
           <h1>Acces tenant refuse</h1>
           <p>Selectionnez un tenant actif ou utilisez un support access grant valide.</p>
@@ -147,7 +149,7 @@ export function TenantDashboard() {
                     <XAxis dataKey="name" />
                     <YAxis />
                     <Tooltip />
-                    <Bar dataKey="progress" fill="#1f9d8a" />
+                    <Bar dataKey="progress" fill="#007aff" radius={[10, 10, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               ) : (
@@ -165,7 +167,7 @@ export function TenantDashboard() {
                     <XAxis dataKey="status" />
                     <YAxis />
                     <Tooltip />
-                    <Bar dataKey="average_completeness" fill="#315f8c" />
+                    <Bar dataKey="average_completeness" fill="#2f9e62" radius={[10, 10, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               ) : (
@@ -214,6 +216,7 @@ export function TenantDashboard() {
 export function TenantHeader() {
   return (
     <header className="admin-header">
+      <BrandLogo variant="sidebar" />
       <div>
         <p className="eyebrow">Tenant MAP</p>
         <h1>Dashboard cartographie</h1>

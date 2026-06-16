@@ -1,6 +1,7 @@
 import { FormEvent, ReactNode, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
+import { BrandLogo } from '../../components/brand/BrandLogo';
 import {
   hasTenantAccess,
   MyActions,
@@ -207,7 +208,7 @@ export function NotificationCenter() {
   return (
     <section className="admin-panel wide">
       <div className="admin-toolbar">
-        <h2>NotificationCenter</h2>
+        <h2>Centre de notifications</h2>
         <button className="button-link" onClick={() => readAll.mutate()} type="button">
           Tout marquer comme lu
         </button>
@@ -263,7 +264,7 @@ export function TaskList({ tasks }: { tasks: TenantTask[] }) {
   if (!tasks.length) return <EmptyState label="Aucune tache." />;
   return (
     <section className="admin-panel wide">
-      <h2>TaskList</h2>
+      <h2>Taches a traiter</h2>
       <div className="stack-list">
         {tasks.map((task) => (
           <article className="admin-panel compact" key={task.id}>
@@ -292,7 +293,7 @@ export function TaskList({ tasks }: { tasks: TenantTask[] }) {
 }
 
 export function TaskStatusBadge({ status }: { status: string }) {
-  return <span className="status-badge">TaskStatusBadge {status}</span>;
+  return <span className="status-badge">{status}</span>;
 }
 
 export function TasksPage() {
@@ -346,6 +347,7 @@ function TenantActivityShell({ title, children }: { title: string; children: Rea
     return (
       <main className="tenant-shell">
         <section className="admin-empty">
+          <BrandLogo variant="full" />
           <p className="eyebrow">{title}</p>
           <h1>Acces tenant refuse</h1>
         </section>

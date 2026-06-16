@@ -10,6 +10,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 
+import { BrandLogo } from '../../components/brand/BrandLogo';
 import { canManageDirections, DirectionItem, hasTenantAccess, tenantApi } from './api';
 import { TenantHeader } from './TenantDashboard';
 
@@ -105,6 +106,7 @@ export function TenantDirectionsPage() {
     return (
       <main className="tenant-shell">
         <section className="admin-empty">
+          <BrandLogo variant="full" />
           <p className="eyebrow">Directions</p>
           <h1>Acces refuse</h1>
           <p>Selectionnez un tenant actif pour consulter les directions.</p>

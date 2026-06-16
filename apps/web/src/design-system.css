@@ -1447,7 +1447,7 @@ input[type='checkbox'] {
   color: var(--pda-text);
 }
 
-.landing-badges span,
+.landing-badges > span,
 .landing-trust span {
   display: inline-flex;
   align-items: center;
@@ -1460,6 +1460,51 @@ input[type='checkbox'] {
   font-weight: 650;
   padding: 0 11px;
   white-space: nowrap;
+}
+
+.landing-badges > .landing-badge--morocco {
+  position: relative;
+  gap: 8px;
+  min-height: 38px;
+  border-color: rgba(193, 39, 45, 0.2);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 247, 247, 0.84)),
+    linear-gradient(90deg, rgba(193, 39, 45, 0.08), rgba(0, 98, 51, 0.045));
+  color: #8f1d22;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 10px 26px rgba(193, 39, 45, 0.08);
+  padding: 4px 7px 4px 13px;
+}
+
+.landing-badge--morocco::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #c1272d;
+  box-shadow:
+    11px 0 0 -2px #006233,
+    0 0 0 5px rgba(193, 39, 45, 0.08);
+}
+
+.landing-badge--morocco span {
+  color: #8f1d22;
+  font-weight: 760;
+}
+
+.landing-badge--morocco small {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  border: 1px solid rgba(0, 98, 51, 0.18);
+  border-radius: 999px;
+  background: rgba(0, 98, 51, 0.08);
+  color: #006233;
+  font-size: 11px;
+  font-weight: 820;
+  padding: 0 8px;
+  letter-spacing: 0;
 }
 
 .landing-product {
@@ -1854,7 +1899,7 @@ input[type='checkbox'] {
 .landing-showcase-card {
   display: grid;
   gap: 9px;
-  min-height: 190px;
+  min-height: 230px;
   overflow: hidden;
   padding: 16px;
 }
@@ -1880,24 +1925,18 @@ input[type='checkbox'] {
   white-space: nowrap;
 }
 
-.landing-showcase-card i {
-  display: block;
-  border-radius: 14px;
-  background: linear-gradient(90deg, rgba(0, 122, 255, 0.1), transparent), #f5f5f7;
-}
-
-.landing-showcase-card i:nth-of-type(1) {
-  height: 54px;
-}
-
-.landing-showcase-card i:nth-of-type(2) {
-  width: 74%;
-  height: 28px;
-}
-
-.landing-showcase-card i:nth-of-type(3) {
-  width: 52%;
-  height: 28px;
+.landing-showcase-card img {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  min-height: 0;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  background: #f5f5f7;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 14px 34px rgba(20, 22, 30, 0.08);
+  object-fit: cover;
+  object-position: top left;
 }
 
 .landing-usecase-grid {

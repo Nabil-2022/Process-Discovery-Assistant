@@ -1,3 +1,10 @@
+import {
+  getStoredAccessToken,
+  isUsableAccessToken,
+  readAccessToken,
+  redirectToLogin,
+} from '../auth/session';
+
 const API_BASE_URL = import.meta.env.VITE_API_URL ?? '/api/v1';
 const previewNow = new Date().toISOString();
 
@@ -1402,7 +1409,7 @@ const previewAiGenerations: AiGeneration[] = [
 ];
 
 function authHeaders() {
-  const token = localStorage.getItem('pda_access_token');
+  const token = getStoredAccessToken();
   const grantId = localStorage.getItem('pda_support_grant_id');
   return {
     ...(isUsableAccessToken(token) ? { Authorization: `Bearer ${token}` } : {}),
@@ -1420,6 +1427,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     credentials: 'include',
     headers,
   });
+  if (response.status === 401) redirectToLogin();
   if (!response.ok) throw new Error(await response.text());
   if (response.status === 204) return undefined as T;
   return response.json() as Promise<T>;
@@ -1433,6 +1441,7 @@ async function requestBlob(path: string): Promise<{ blob: Blob; filename?: strin
     credentials: 'include',
     headers,
   });
+  if (response.status === 401) redirectToLogin();
   if (!response.ok) throw new Error(await response.text());
   return {
     blob: await response.blob(),
@@ -2138,9 +2147,11 @@ export const tenantApi = {
 
 export function hasTenantAccess() {
   if (isDemoAuthBypassEnabled()) return true;
-  const token = localStorage.getItem('pda_access_token');
+  const token = getStoredAccessToken();
   if (!token && isUiPreviewMode()) return true;
-  return Boolean(isUsableAccessToken(token) || localStorage.getItem('pda_support_grant_id'));
+  const hasAccess = Boolean(isUsableAccessToken(token) || localStorage.getItem('pda_support_grant_id'));
+  if (!hasAccess) redirectToLogin();
+  return hasAccess;
 }
 
 export function canManageDirections() {
@@ -2159,19 +2170,11 @@ export function canManageAiSuggestions() {
 
 function hasAnyPermission(codes: string[]) {
   if (isDemoAuthBypassEnabled()) return true;
-  const token = localStorage.getItem('pda_access_token');
+  const token = getStoredAccessToken();
   if (!token && isUiPreviewMode()) return true;
   if (!token) return false;
-  try {
-    const [, payload] = token.split('.');
-    if (!payload) return false;
-    const parsed = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/'))) as {
-      permissions?: string[];
-    };
-    return parsed.permissions?.some((permission) => codes.includes(permission)) ?? false;
-  } catch {
-    return false;
-  }
+  const parsed = readAccessToken(token);
+  return parsed?.permissions?.some((permission) => codes.includes(permission)) ?? false;
 }
 
 function isUiPreviewMode() {
@@ -2182,21 +2185,3 @@ function isDemoAuthBypassEnabled() {
   return import.meta.env.VITE_DEMO_AUTH_BYPASS === 'true';
 }
 
-function isUsableAccessToken(token: string | null) {
-  if (!token) return false;
-  try {
-    const [, payload] = token.split('.');
-    if (!payload) return false;
-    const parsed = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/'))) as {
-      active_tenant_id?: string;
-      exp?: number;
-      token_type?: string;
-    };
-    if (parsed.token_type && parsed.token_type !== 'access') return false;
-    if (!parsed.active_tenant_id) return false;
-    if (parsed.exp && parsed.exp * 1000 <= Date.now()) return false;
-    return true;
-  } catch {
-    return false;
-  }
-}

@@ -16,6 +16,19 @@ import { BrandLogo } from '../../components/brand/BrandLogo';
 import { hasTenantAccess, tenantApi } from './api';
 
 const palette = ['#007aff', '#2f9e62', '#b7791f', '#d92d20', '#6e6e73'];
+const maturityPalette = ['#007aff', '#2f9e62', '#b7791f', '#d92d20', '#7c3aed', '#475569'];
+const maturityStatusColors: Record<string, string> = {
+  DRAFT: '#b7791f',
+  IN_PROGRESS: '#007aff',
+  READY_FOR_REVIEW: '#7c3aed',
+  SUBMITTED: '#0f766e',
+  UNDER_REVIEW: '#6366f1',
+  CHANGES_REQUESTED: '#d92d20',
+  RESUBMITTED: '#0891b2',
+  APPROVED: '#2f9e62',
+  PUBLISHED: '#166534',
+  ARCHIVED: '#6e6e73',
+};
 
 export function TenantDashboard() {
   const [filters, setFilters] = useState({ period: '30d', process_status: '', campaign_id: '' });
@@ -167,7 +180,14 @@ export function TenantDashboard() {
                     <XAxis dataKey="status" />
                     <YAxis />
                     <Tooltip />
-                    <Bar dataKey="average_completeness" fill="#2f9e62" radius={[10, 10, 0, 0]} />
+                    <Bar dataKey="average_completeness" radius={[10, 10, 0, 0]}>
+                      {maturity.data.map((item, index) => (
+                        <Cell
+                          key={item.label ?? index}
+                          fill={maturityColor(item.label, index)}
+                        />
+                      ))}
+                    </Bar>
                   </BarChart>
                 </ResponsiveContainer>
               ) : (
@@ -282,6 +302,10 @@ function PiePanel({ title, data }: { title: string; data: { label: string; count
       )}
     </ChartPanel>
   );
+}
+
+function maturityColor(status: string | undefined, index: number) {
+  return (status ? maturityStatusColors[status] : undefined) ?? maturityPalette[index % maturityPalette.length];
 }
 
 function SkeletonCards() {

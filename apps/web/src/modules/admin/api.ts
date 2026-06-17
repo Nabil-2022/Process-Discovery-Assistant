@@ -1,3 +1,5 @@
+import { getStoredAccessToken, readAccessToken, redirectToLogin } from '../auth/session';
+
 const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api/v1';
 
 export type DashboardSummary = {
@@ -85,7 +87,7 @@ export type TenantFilters = {
 };
 
 function authHeaders() {
-  const token = localStorage.getItem('pda_access_token');
+  const token = getStoredAccessToken();
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
@@ -101,6 +103,10 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     credentials: 'include',
     headers,
   });
+
+  if (response.status === 401) {
+    redirectToLogin();
+  }
 
   if (!response.ok) {
     throw new Error(await response.text());
@@ -168,18 +174,15 @@ export const adminApi = {
 };
 
 export function hasSuperAdminAccess() {
-  const token = localStorage.getItem('pda_access_token');
+  const token = getStoredAccessToken();
   if (!token) {
+    redirectToLogin();
     return false;
   }
-  try {
-    const [, payload] = token.split('.');
-    if (!payload) return false;
-    const parsed = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/'))) as {
-      global_roles?: string[];
-    };
-    return parsed.global_roles?.includes('super_admin') ?? false;
-  } catch {
+  const parsed = readAccessToken(token);
+  if (!parsed) {
+    redirectToLogin();
     return false;
   }
+  return parsed.global_roles?.includes('super_admin') ?? false;
 }

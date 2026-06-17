@@ -1,5 +1,11 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+
+import {
+  getStoredAccessToken,
+  readAccessToken,
+  storeAccessToken,
+} from './session';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api/v1';
 const DEFAULT_TENANT_SLUG = 'map-demo';
@@ -23,15 +29,10 @@ type SelectTenantResponse = {
   permissions: string[];
 };
 
-type AccessTokenPayload = {
-  active_tenant_id?: string;
-  global_roles?: string[];
-  tenant_roles?: string[];
-  exp?: number;
-};
-
 export function LoginPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const nextPath = safeNextPath(searchParams.get('next'));
   const [email, setEmail] = useState('tenant.admin@example.test');
   const [password, setPassword] = useState('ChangeMe12345!');
   const [remember, setRemember] = useState(true);
@@ -40,15 +41,15 @@ export function LoginPage() {
   const [error, setError] = useState('');
   const [isSubmitting, setSubmitting] = useState(false);
 
-  const existingToken = useMemo(() => readAccessToken(localStorage.getItem('pda_access_token')), []);
+  const existingToken = useMemo(() => readAccessToken(getStoredAccessToken()), []);
 
   useEffect(() => {
     if (existingToken?.active_tenant_id) {
-      navigate('/tenant/dashboard', { replace: true });
+      navigate(nextPath ?? '/tenant/dashboard', { replace: true });
     } else if (existingToken?.global_roles?.includes('super_admin')) {
-      navigate('/admin', { replace: true });
+      navigate(nextPath ?? '/admin', { replace: true });
     }
-  }, [existingToken, navigate]);
+  }, [existingToken, navigate, nextPath]);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -66,7 +67,7 @@ export function LoginPage() {
         }),
       });
 
-      localStorage.setItem('pda_access_token', result.access_token);
+      storeAccessToken(result.access_token);
 
       if (result.requires_tenant_selection) {
         setTokenForTenantSelection(result.access_token);
@@ -96,7 +97,7 @@ export function LoginPage() {
         },
         tokenForTenantSelection,
       );
-      localStorage.setItem('pda_access_token', result.access_token);
+      storeAccessToken(result.access_token);
       routeAfterLogin(result.access_token);
     } catch (err) {
       setError(errorMessage(err));
@@ -108,14 +109,14 @@ export function LoginPage() {
   function routeAfterLogin(token: string) {
     const payload = readAccessToken(token);
     if (payload?.active_tenant_id) {
-      navigate('/tenant/dashboard', { replace: true });
+      navigate(nextPath ?? '/tenant/dashboard', { replace: true });
       return;
     }
     if (payload?.global_roles?.includes('super_admin')) {
-      navigate('/admin', { replace: true });
+      navigate(nextPath ?? '/admin', { replace: true });
       return;
     }
-    navigate('/tenant/dashboard', { replace: true });
+    navigate(nextPath ?? '/tenant/dashboard', { replace: true });
   }
 
   return (
@@ -200,21 +201,6 @@ async function request<T>(path: string, init: RequestInit, token?: string): Prom
   return response.json() as Promise<T>;
 }
 
-function readAccessToken(token: string | null): AccessTokenPayload | null {
-  if (!token) return null;
-  try {
-    const [, payload] = token.split('.');
-    if (!payload) return null;
-    const parsed = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/'))) as
-      | AccessTokenPayload
-      | undefined;
-    if (parsed?.exp && parsed.exp * 1000 <= Date.now()) return null;
-    return parsed ?? null;
-  } catch {
-    return null;
-  }
-}
-
 function errorMessage(err: unknown) {
   if (!(err instanceof Error)) return 'Erreur de connexion.';
   try {
@@ -224,4 +210,11 @@ function errorMessage(err: unknown) {
   } catch {
     return err.message;
   }
+}
+
+function safeNextPath(next: string | null) {
+  if (!next) return null;
+  if (!next.startsWith('/') || next.startsWith('//')) return null;
+  if (next.startsWith('/login')) return null;
+  return next;
 }

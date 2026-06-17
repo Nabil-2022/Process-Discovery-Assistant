@@ -116,8 +116,7 @@ export function MegaBpmnPage() {
           </div>
         </article>
 
-        <aside className="admin-panel compact mega-bpmn-sidebar">
-          <h2>Filtres</h2>
+        <section className="admin-panel compact mega-bpmn-toolbar">
           <label>
             Recherche
             <input
@@ -173,7 +172,7 @@ export function MegaBpmnPage() {
               <i className="correction" /> A corriger
             </span>
           </div>
-        </aside>
+        </section>
 
         <article className="admin-panel mega-bpmn-canvas-panel">
           {query.isLoading ? <p className="empty-inline">Chargement de la cartographie...</p> : null}

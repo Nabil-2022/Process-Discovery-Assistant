@@ -11,7 +11,13 @@ import {
 } from '@tanstack/react-table';
 
 import { BrandLogo } from '../../components/brand/BrandLogo';
-import { canManageDirections, DirectionItem, hasTenantAccess, tenantApi } from './api';
+import {
+  canManageDirections,
+  DirectionItem,
+  downloadBlobFile,
+  hasTenantAccess,
+  tenantApi,
+} from './api';
 import { TenantHeader } from './TenantDashboard';
 
 export function TenantDirectionsPage() {
@@ -19,6 +25,8 @@ export function TenantDirectionsPage() {
   const [page, setPage] = useState(1);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [view, setView] = useState<'table' | 'cards'>('table');
+  const [exporting, setExporting] = useState(false);
+  const [exportError, setExportError] = useState('');
   const allowed = hasTenantAccess();
   const canWrite = canManageDirections();
   const queryClient = useQueryClient();
@@ -135,10 +143,25 @@ export function TenantDirectionsPage() {
             <option value="table">Tableau</option>
             <option value="cards">Cartes</option>
           </select>
-          <a className="button-link" href="/api/v1/tenant/directions/export.csv">
-            Export CSV
-          </a>
+          <button
+            type="button"
+            disabled={exporting}
+            onClick={async () => {
+              setExportError('');
+              setExporting(true);
+              try {
+                await downloadBlobFile(tenantApi.downloadDirectionsCsv(), 'directions.csv');
+              } catch (error) {
+                setExportError(error instanceof Error ? error.message : 'Export impossible');
+              } finally {
+                setExporting(false);
+              }
+            }}
+          >
+            {exporting ? 'Export...' : 'Export CSV'}
+          </button>
         </div>
+        {exportError ? <p className="error-text">{exportError}</p> : null}
 
         {canWrite ? (
           <section className="admin-panel wide">

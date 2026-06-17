@@ -16,6 +16,7 @@ import {
   canCreateProcess,
   canManageAiSuggestions,
   Completeness,
+  downloadBlobFile,
   EventLogImport,
   ExportFormat,
   ExportJob,
@@ -706,9 +707,11 @@ function RaciToolbar({
         <button type="button" onClick={onInvalidate} disabled={busy || !raci}>
           Invalider
         </button>
-        <a className="button-link" href={`/api/v1/tenant/processes/${processId}/raci/export.csv`}>
-          CSV
-        </a>
+        <FileDownloadButton
+          label="CSV"
+          fallbackFilename={`raci-${processId}.csv`}
+          download={() => tenantApi.downloadRaciCsv(processId)}
+        />
         <Link className="button-link" to={`/tenant/processes/${processId}/wizard`}>
           Wizard
         </Link>
@@ -979,12 +982,16 @@ function BpmnToolbar({
         <button type="button" onClick={onInvalidate} disabled={busy || !bpmn}>
           Invalider
         </button>
-        <a className="button-link" href={`/api/v1/tenant/processes/${processId}/bpmn/export.xml`}>
-          XML
-        </a>
-        <a className="button-link" href={`/api/v1/tenant/processes/${processId}/bpmn/export.json`}>
-          JSON
-        </a>
+        <FileDownloadButton
+          label="XML"
+          fallbackFilename={`bpmn-${processId}.xml`}
+          download={() => tenantApi.downloadBpmnXml(processId)}
+        />
+        <FileDownloadButton
+          label="JSON"
+          fallbackFilename={`bpmn-${processId}.json`}
+          download={() => tenantApi.downloadBpmnJson(processId)}
+        />
         <Link className="button-link" to={`/tenant/processes/${processId}/wizard`}>
           Wizard
         </Link>
@@ -1791,6 +1798,40 @@ function formatLabel(format: ExportFormat) {
   return labels[format] ?? format;
 }
 
+function FileDownloadButton({
+  label,
+  fallbackFilename,
+  download,
+}: {
+  label: string;
+  fallbackFilename: string;
+  download: () => Promise<{ blob: Blob; filename?: string }>;
+}) {
+  const [downloading, setDownloading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleDownload() {
+    setError(null);
+    setDownloading(true);
+    try {
+      await downloadBlobFile(download(), fallbackFilename);
+    } catch (downloadError) {
+      setError(downloadError instanceof Error ? downloadError.message : 'Telechargement impossible');
+    } finally {
+      setDownloading(false);
+    }
+  }
+
+  return (
+    <>
+      <button type="button" onClick={handleDownload} disabled={downloading}>
+        {downloading ? 'Telechargement...' : label}
+      </button>
+      {error ? <p className="error-text">{error}</p> : null}
+    </>
+  );
+}
+
 function ExportDownloadButton({ job }: { job: ExportJob }) {
   const [downloading, setDownloading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -1803,14 +1844,7 @@ function ExportDownloadButton({ job }: { job: ExportJob }) {
     setDownloading(true);
     try {
       const { blob, filename } = await tenantApi.downloadExport(job.id);
-      const objectUrl = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = objectUrl;
-      link.download = filename ?? job.fileName ?? 'export.bin';
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      URL.revokeObjectURL(objectUrl);
+      await downloadBlobFile(Promise.resolve({ blob, filename }), job.fileName ?? 'export.bin');
     } catch (downloadError) {
       setError(downloadError instanceof Error ? downloadError.message : 'Telechargement impossible');
     } finally {
@@ -3192,9 +3226,13 @@ function WizardStep({
           Atelier de Formalisation
         </Link>
         <AiAssistLink processId={process?.id} label="Analyser les incoherences" />
-        <a className="button-link" href={`/api/v1/tenant/processes/${process?.id}/bpmn/export.xml`}>
-          Export XML BPMN
-        </a>
+        {process?.id ? (
+          <FileDownloadButton
+            label="Export XML BPMN"
+            fallbackFilename={`bpmn-${process.id}.xml`}
+            download={() => tenantApi.downloadBpmnXml(process.id)}
+          />
+        ) : null}
       </div>
       <h3>Checklist qualite</h3>
       <div className="quality-checklist">

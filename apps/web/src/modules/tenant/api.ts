@@ -1445,6 +1445,21 @@ function filenameFromDisposition(value: string | null) {
   return match?.[1];
 }
 
+export async function downloadBlobFile(
+  download: Promise<{ blob: Blob; filename?: string }>,
+  fallbackFilename: string,
+) {
+  const { blob, filename } = await download;
+  const objectUrl = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = objectUrl;
+  link.download = filename ?? fallbackFilename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(objectUrl);
+}
+
 function params(filters: DirectionFilters) {
   const search = new URLSearchParams();
   Object.entries(filters).forEach(([key, value]) => {
@@ -1555,6 +1570,7 @@ export const tenantApi = {
     request<
       { id: string; name: string; status: string; completenessScore: string; updatedAt: string }[]
     >(`/tenant/directions/${id}/processes`),
+  downloadDirectionsCsv: () => requestBlob('/tenant/directions/export.csv'),
   processes: (filters: {
     search?: string;
     status?: string;
@@ -1700,6 +1716,7 @@ export const tenantApi = {
       : request<{ id: string; versionNumber: number; createdAt: string }[]>(
           `/tenant/processes/${id}/raci/versions`,
         ),
+  downloadRaciCsv: (id: string) => requestBlob(`/tenant/processes/${id}/raci/export.csv`),
   bpmn: (id: string) =>
     isUiPreviewMode()
       ? Promise.resolve(previewBpmn)
@@ -1740,6 +1757,8 @@ export const tenantApi = {
       : request<{ id: string; versionNumber: number; createdAt: string }[]>(
           `/tenant/processes/${id}/bpmn/versions`,
         ),
+  downloadBpmnXml: (id: string) => requestBlob(`/tenant/processes/${id}/bpmn/export.xml`),
+  downloadBpmnJson: (id: string) => requestBlob(`/tenant/processes/${id}/bpmn/export.json`),
   workshopOverview: (id: string) =>
     isUiPreviewMode()
       ? Promise.resolve({
@@ -1908,7 +1927,7 @@ export const tenantApi = {
     isUiPreviewMode()
       ? Promise.resolve(previewActivity)
       : request<TenantActivity[]>(`/tenant/audit?${params(filters)}`),
-  auditExportUrl: () => `${API_BASE_URL}/tenant/audit/export.csv`,
+  downloadAuditCsv: () => requestBlob('/tenant/audit/export.csv'),
   tasks: (filters: Record<string, string> = {}) =>
     isUiPreviewMode()
       ? Promise.resolve(previewTasks)

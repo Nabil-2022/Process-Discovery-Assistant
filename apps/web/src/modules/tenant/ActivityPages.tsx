@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { BrandLogo } from '../../components/brand/BrandLogo';
 import {
+  downloadBlobFile,
   hasTenantAccess,
   MyActions,
   NotificationPreferences,
@@ -127,6 +128,8 @@ export function AuditPage() {
     resource_type: '',
     result: '',
   });
+  const [exporting, setExporting] = useState(false);
+  const [exportError, setExportError] = useState('');
   const audit = useQuery({
     queryKey: ['tenant-audit', filters],
     queryFn: () => tenantApi.audit(filters),
@@ -135,9 +138,25 @@ export function AuditPage() {
   return (
     <TenantActivityShell title="Audit">
       <ActivityFilters filters={filters} onChange={setFilters} />
-      <a className="button-link" href={tenantApi.auditExportUrl()}>
-        Export CSV
-      </a>
+      <button
+        className="button-link"
+        type="button"
+        disabled={exporting}
+        onClick={async () => {
+          setExportError('');
+          setExporting(true);
+          try {
+            await downloadBlobFile(tenantApi.downloadAuditCsv(), 'audit.csv');
+          } catch (error) {
+            setExportError(error instanceof Error ? error.message : 'Export impossible');
+          } finally {
+            setExporting(false);
+          }
+        }}
+      >
+        {exporting ? 'Export...' : 'Export CSV'}
+      </button>
+      {exportError ? <p className="error-text">{exportError}</p> : null}
       <ActivityTable items={audit.data ?? []} loading={audit.isLoading} error={audit.error} />
     </TenantActivityShell>
   );

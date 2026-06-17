@@ -401,6 +401,10 @@ p {
   text-align: left;
 }
 
+.link-button.danger {
+  color: #b42318;
+}
+
 .table-actions {
   display: flex;
   gap: 6px;

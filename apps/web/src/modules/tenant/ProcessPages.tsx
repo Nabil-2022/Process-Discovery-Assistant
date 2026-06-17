@@ -83,6 +83,7 @@ const stepTitles = [
 ];
 
 export function TenantProcessesPage() {
+  const queryClient = useQueryClient();
   const [filters, setFilters] = useState({
     search: '',
     status: '',
@@ -94,6 +95,10 @@ export function TenantProcessesPage() {
     queryKey: ['processes', filters],
     queryFn: () => tenantApi.processes(filters),
     enabled: allowed,
+  });
+  const deleteProcess = useMutation({
+    mutationFn: (process: ProcessItem) => tenantApi.deleteProcess(process.id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['processes'] }),
   });
 
   if (!allowed) return <AccessDenied />;
@@ -182,6 +187,22 @@ export function TenantProcessesPage() {
                         <div className="table-actions">
                           <Link to={`/tenant/processes/${process.id}/workshop`}>Atelier</Link>
                           <Link to={`/tenant/processes/${process.id}/wizard`}>Wizard</Link>
+                          <button
+                            type="button"
+                            className="link-button danger"
+                            disabled={deleteProcess.isPending}
+                            onClick={() => {
+                              if (
+                                window.confirm(
+                                  `Supprimer le processus "${process.name}" ? Il sera archive et retire des listes.`,
+                                )
+                              ) {
+                                deleteProcess.mutate(process);
+                              }
+                            }}
+                          >
+                            Supprimer
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -192,6 +213,7 @@ export function TenantProcessesPage() {
           ) : (
             !query.isLoading && <p className="empty-inline">Aucun processus.</p>
           )}
+          {deleteProcess.error ? <p className="error-text">{deleteProcess.error.message}</p> : null}
         </section>
       </section>
     </main>

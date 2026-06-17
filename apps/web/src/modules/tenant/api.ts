@@ -2121,19 +2121,7 @@ export function hasTenantAccess() {
   if (isDemoAuthBypassEnabled()) return true;
   const token = localStorage.getItem('pda_access_token');
   if (!token && isUiPreviewMode()) return true;
-  if (!token) return false;
-  try {
-    const [, payload] = token.split('.');
-    if (!payload) return false;
-    const parsed = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/'))) as {
-      tenant_roles?: string[];
-      active_tenant_id?: string;
-      global_roles?: string[];
-    };
-    return Boolean(parsed.active_tenant_id || localStorage.getItem('pda_support_grant_id'));
-  } catch {
-    return false;
-  }
+  return Boolean(isUsableAccessToken(token) || localStorage.getItem('pda_support_grant_id'));
 }
 
 export function canManageDirections() {
@@ -2172,7 +2160,7 @@ function isUiPreviewMode() {
 }
 
 function isDemoAuthBypassEnabled() {
-  return import.meta.env.VITE_DEMO_AUTH_BYPASS !== 'false';
+  return import.meta.env.VITE_DEMO_AUTH_BYPASS === 'true';
 }
 
 function isUsableAccessToken(token: string | null) {

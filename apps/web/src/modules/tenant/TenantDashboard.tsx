@@ -225,6 +225,7 @@ export function TenantHeader() {
         <a href="/tenant/dashboard">Dashboard</a>
         <a href="/tenant/directions">Directions</a>
         <a href="/tenant/processes">Processus</a>
+        <a href="/tenant/mega-bpmn">Mega BPMN</a>
         <a href="/tenant/exports">Exports</a>
         <a href="/tenant/notifications">Notifications</a>
         <a href="/tenant/my-actions">Mes actions</a>

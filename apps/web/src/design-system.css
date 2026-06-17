@@ -1137,6 +1137,281 @@ h3 {
   opacity: 0.86;
 }
 
+.mega-bpmn-page {
+  grid-template-columns: minmax(250px, 310px) minmax(0, 1fr);
+  align-items: start;
+}
+
+.mega-bpmn-intro {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: end;
+  min-height: auto;
+}
+
+.mega-bpmn-intro h1 {
+  margin-top: 4px;
+  font-size: clamp(1.8rem, 3vw, 2.7rem);
+}
+
+.mega-bpmn-intro p:not(.eyebrow) {
+  max-width: 820px;
+  margin-top: 8px;
+  color: var(--pda-text-muted);
+  line-height: 1.55;
+}
+
+.mega-bpmn-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(92px, 1fr));
+  gap: 10px;
+}
+
+.mega-bpmn-stats span {
+  display: grid;
+  gap: 4px;
+  min-width: 92px;
+  border: 1px solid var(--pda-border);
+  border-radius: var(--pda-radius-md);
+  background: rgba(255, 255, 255, 0.74);
+  padding: 12px;
+}
+
+.mega-bpmn-stats small,
+.mega-bpmn-sidebar label,
+.mega-bpmn-legend span {
+  color: var(--pda-text-muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.mega-bpmn-stats strong {
+  color: var(--pda-text);
+  font-size: 1.28rem;
+  line-height: 1;
+}
+
+.mega-bpmn-sidebar {
+  grid-column: 1;
+  display: grid;
+  gap: 14px;
+  min-height: auto;
+}
+
+.mega-bpmn-sidebar label {
+  display: grid;
+  gap: 7px;
+}
+
+.mega-bpmn-legend {
+  display: grid;
+  gap: 9px;
+  border-top: 1px solid var(--pda-border);
+  padding-top: 14px;
+}
+
+.mega-bpmn-legend span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mega-bpmn-legend i {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+}
+
+.mega-bpmn-legend .draft {
+  background: var(--pda-amber);
+}
+
+.mega-bpmn-legend .submitted {
+  background: var(--pda-blue);
+}
+
+.mega-bpmn-legend .approved {
+  background: var(--pda-green);
+}
+
+.mega-bpmn-legend .correction {
+  background: var(--pda-red);
+}
+
+.mega-bpmn-canvas-panel {
+  grid-column: 2;
+  min-height: 680px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.mega-bpmn-canvas-panel > .empty-inline,
+.mega-bpmn-canvas-panel > .error-text {
+  margin: 20px;
+}
+
+.mega-bpmn-viewer {
+  width: 100%;
+  height: clamp(560px, 76vh, 880px);
+  background:
+    radial-gradient(circle at 34% 0%, rgba(0, 122, 255, 0.07), transparent 34rem),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.94));
+}
+
+.mega-bpmn-viewer .react-flow {
+  background: transparent;
+  font-family: var(--pda-font);
+}
+
+.mega-bpmn-viewer .react-flow__edge-path {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.mega-bpmn-viewer .react-flow__controls,
+.mega-bpmn-viewer .react-flow__minimap {
+  overflow: hidden;
+  border: 1px solid var(--pda-border);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: var(--pda-shadow-sm);
+}
+
+.mega-bpmn-viewer .react-flow__controls-button {
+  border-bottom-color: var(--pda-border);
+  background: transparent;
+}
+
+.mega-bpmn-direction-node {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border: 1px solid rgba(0, 122, 255, 0.14);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.46);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  padding: 18px;
+}
+
+.mega-bpmn-direction-node strong,
+.mega-bpmn-process-node strong,
+.mega-bpmn-milestone strong {
+  display: block;
+  color: var(--pda-text);
+  font-weight: 780;
+  line-height: 1.15;
+}
+
+.mega-bpmn-direction-node span,
+.mega-bpmn-direction-node small,
+.mega-bpmn-process-node small,
+.mega-bpmn-milestone small {
+  color: var(--pda-text-muted);
+  font-size: 0.76rem;
+  font-weight: 660;
+}
+
+.mega-bpmn-direction-node span {
+  display: block;
+  margin-top: 4px;
+}
+
+.mega-bpmn-direction-node small {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+}
+
+.mega-bpmn-process-node {
+  display: grid;
+  width: 330px;
+  min-height: 108px;
+  gap: 7px;
+  border: 1px solid var(--pda-border);
+  border-left: 5px solid var(--pda-amber);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 16px 36px rgba(20, 22, 30, 0.08);
+  padding: 13px 14px 12px;
+  cursor: pointer;
+}
+
+.mega-bpmn-process-node:hover {
+  border-color: rgba(0, 122, 255, 0.34);
+  box-shadow: 0 18px 46px rgba(20, 22, 30, 0.12);
+}
+
+.mega-bpmn-process-node.submitted {
+  border-left-color: var(--pda-blue);
+}
+
+.mega-bpmn-process-node.approved {
+  border-left-color: var(--pda-green);
+}
+
+.mega-bpmn-process-node.correction {
+  border-left-color: var(--pda-red);
+}
+
+.mega-bpmn-node-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.mega-bpmn-node-topline span {
+  color: var(--pda-blue-dark);
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.mega-bpmn-node-topline small {
+  color: var(--pda-text);
+}
+
+.mega-bpmn-process-node strong {
+  overflow-wrap: anywhere;
+  font-size: 0.96rem;
+}
+
+.mega-bpmn-progress {
+  overflow: hidden;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.mega-bpmn-progress i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--pda-blue), var(--pda-green));
+}
+
+.mega-bpmn-milestone {
+  display: grid;
+  width: 116px;
+  height: 116px;
+  place-items: center;
+  border: 2px solid rgba(29, 29, 31, 0.72);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 14px 34px rgba(20, 22, 30, 0.08);
+  text-align: center;
+}
+
+.mega-bpmn-viewer .react-flow__handle {
+  width: 8px;
+  height: 8px;
+  border: 2px solid #ffffff;
+  background: var(--pda-blue);
+  opacity: 0.82;
+}
+
 .bpmn-viewer svg {
   width: min(100%, 980px);
   min-width: 820px;
@@ -2084,6 +2359,19 @@ input[type='checkbox'] {
     grid-template-columns: 1fr;
   }
 
+  .mega-bpmn-page {
+    grid-template-columns: 1fr;
+  }
+
+  .mega-bpmn-sidebar,
+  .mega-bpmn-canvas-panel {
+    grid-column: 1;
+  }
+
+  .mega-bpmn-intro {
+    grid-template-columns: 1fr;
+  }
+
   .raci-preview {
     grid-template-columns: 1fr;
   }
@@ -2170,6 +2458,14 @@ input[type='checkbox'] {
 
   .workshop-tabs button {
     flex: 0 0 auto;
+  }
+
+  .mega-bpmn-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mega-bpmn-viewer {
+    height: 620px;
   }
 
   .bpmn-viewer svg {

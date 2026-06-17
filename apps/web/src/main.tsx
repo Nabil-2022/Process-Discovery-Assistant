@@ -37,6 +37,9 @@ const TenantProcessesPage = lazy(() =>
 const TenantExportsPage = lazy(() =>
   import('./modules/tenant/ProcessPages').then((module) => ({ default: module.TenantExportsPage })),
 );
+const MegaBpmnPage = lazy(() =>
+  import('./modules/tenant/MegaBpmnPage').then((module) => ({ default: module.MegaBpmnPage })),
+);
 const NewProcessPage = lazy(() =>
   import('./modules/tenant/ProcessPages').then((module) => ({ default: module.NewProcessPage })),
 );
@@ -111,6 +114,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
             <Route path="/tenant/directions" element={<TenantDirectionsPage />} />
             <Route path="/tenant/directions/:id" element={<DirectionDetailPage />} />
             <Route path="/tenant/processes" element={<TenantProcessesPage />} />
+            <Route path="/tenant/mega-bpmn" element={<MegaBpmnPage />} />
             <Route path="/tenant/exports" element={<TenantExportsPage />} />
             <Route path="/tenant/notifications" element={<NotificationsPage />} />
             <Route

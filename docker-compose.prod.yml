@@ -8,10 +8,12 @@ services:
     environment:
       NODE_ENV: production
       PORT: 3000
-      APP_URL: http://process.higroup.systems
-      FRONTEND_URL: http://process.higroup.systems
-      CORS_ORIGIN: http://process.higroup.systems,http://197.153.60.68
-      API_URL: http://197.153.60.68:8050/api/v1
+      APP_URL: ${PDA_PUBLIC_APP_URL:-http://process.higroup.systems}
+      FRONTEND_URL: ${PDA_PUBLIC_APP_URL:-http://process.higroup.systems}
+      CORS_ORIGIN: ${PDA_CORS_ORIGIN:-http://process.higroup.systems,http://197.153.60.68}
+      API_URL: ${PDA_PUBLIC_API_URL:-http://197.153.60.68:8050/api/v1}
+      DATABASE_URL: 'postgresql://process_discovery:process_discovery@postgres:5432/process_discovery_local?schema=process_discovery'
+      DIRECT_DATABASE_URL: 'postgresql://process_discovery:process_discovery@postgres:5432/process_discovery_local?schema=process_discovery'
       COOKIE_DOMAIN: ''
       COOKIE_SECURE: 'false'
       COOKIE_SAME_SITE: lax
@@ -20,6 +22,11 @@ services:
       JWT_REFRESH_EXPIRES_IN: 30d
       SMTP_HOST: mailpit
       SMTP_PORT: '1025'
+      STORAGE_ENDPOINT: http://minio:9000
+      STORAGE_ACCESS_KEY: processdiscovery
+      STORAGE_SECRET_KEY: processdiscovery
+      STORAGE_BUCKET: process-discovery-exports
+      STORAGE_LOCAL_PATH: /app/storage/exports
       LOCAL_AUTH_BYPASS: 'false'
       AI_PROVIDER: ${AI_PROVIDER:-mock}
       AI_API_KEY: ${AI_API_KEY:-}
@@ -50,7 +57,7 @@ services:
       context: .
       dockerfile: apps/web/Dockerfile
       args:
-        VITE_API_URL: http://197.153.60.68:8050/api/v1
+        VITE_API_URL: ${PDA_PUBLIC_API_URL:-http://197.153.60.68:8050/api/v1}
     ports:
       - '80:80'
     restart: unless-stopped

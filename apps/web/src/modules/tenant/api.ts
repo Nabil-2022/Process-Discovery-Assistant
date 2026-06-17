@@ -1425,6 +1425,26 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return response.json() as Promise<T>;
 }
 
+async function requestBlob(path: string): Promise<{ blob: Blob; filename?: string }> {
+  const headers = new Headers();
+  for (const [key, value] of Object.entries(authHeaders())) headers.set(key, value);
+
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    credentials: 'include',
+    headers,
+  });
+  if (!response.ok) throw new Error(await response.text());
+  return {
+    blob: await response.blob(),
+    filename: filenameFromDisposition(response.headers.get('content-disposition')),
+  };
+}
+
+function filenameFromDisposition(value: string | null) {
+  const match = value?.match(/filename="?([^"]+)"?/i);
+  return match?.[1];
+}
+
 function params(filters: DirectionFilters) {
   const search = new URLSearchParams();
   Object.entries(filters).forEach(([key, value]) => {
@@ -1838,6 +1858,7 @@ export const tenantApi = {
       ? Promise.resolve({ ...previewExportJobs[0], id, status: 'COMPLETED' })
       : request<ExportJob>(`/tenant/exports/${id}/retry`, { method: 'POST' }),
   exportDownloadUrl: (id: string) => `${API_BASE_URL}/tenant/exports/${id}/download`,
+  downloadExport: (id: string) => requestBlob(`/tenant/exports/${id}/download`),
   notifications: () =>
     isUiPreviewMode()
       ? Promise.resolve({

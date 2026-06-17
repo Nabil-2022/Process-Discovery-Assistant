@@ -1504,9 +1504,13 @@ export function ProcessWorkshopPage() {
 export function TenantExportsPage() {
   const [exportType, setExportType] = useState<ExportType>('process_sheet');
   const [exportFormat, setExportFormat] = useState<ExportFormat>('pdf');
-  const [processId, setProcessId] = useState('preview-process-cloture');
+  const [processId, setProcessId] = useState('');
   const queryClient = useQueryClient();
   const jobs = useQuery({ queryKey: ['exports'], queryFn: () => tenantApi.exports() });
+  const processes = useQuery({
+    queryKey: ['export-processes'],
+    queryFn: () => tenantApi.processes({}),
+  });
   const create = useMutation({
     mutationFn: () =>
       tenantApi.createExport({
@@ -1548,6 +1552,8 @@ export function TenantExportsPage() {
             exportType={exportType}
             exportFormat={exportFormat}
             processId={processId}
+            processes={processes.data ?? []}
+            loadingProcesses={processes.isLoading}
             onTypeChange={setExportType}
             onFormatChange={setExportFormat}
             onProcessChange={setProcessId}
@@ -1572,6 +1578,8 @@ function ExportDrawer({
   exportType,
   exportFormat,
   processId,
+  processes,
+  loadingProcesses,
   creating,
   error,
   onTypeChange,
@@ -1582,6 +1590,8 @@ function ExportDrawer({
   exportType: ExportType;
   exportFormat: ExportFormat;
   processId: string;
+  processes: ProcessItem[];
+  loadingProcesses: boolean;
   creating: boolean;
   error: Error | null;
   onTypeChange: (value: ExportType) => void;
@@ -1594,11 +1604,21 @@ function ExportDrawer({
       <h2>Demander un export officiel</h2>
       <ExportTypeSelector value={exportType} onChange={onTypeChange} />
       <ExportFormatSelector value={exportFormat} onChange={onFormatChange} />
-      <input
-        value={processId}
-        onChange={(event) => onProcessChange(event.target.value)}
-        placeholder="Process ID"
-      />
+      <label>
+        Processus
+        <select
+          value={processId}
+          onChange={(event) => onProcessChange(event.target.value)}
+          disabled={loadingProcesses}
+        >
+          <option value="">Sans processus specifique</option>
+          {processes.map((process) => (
+            <option key={process.id} value={process.id}>
+              {process.name} {process.code ? `(${process.code})` : ''}
+            </option>
+          ))}
+        </select>
+      </label>
       <button type="button" onClick={onCreate} disabled={creating}>
         Demander export
       </button>
@@ -1750,12 +1770,39 @@ function formatLabel(format: ExportFormat) {
 }
 
 function ExportDownloadButton({ job }: { job: ExportJob }) {
+  const [downloading, setDownloading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
   if (job.status !== 'COMPLETED')
     return <span className="empty-inline">Telechargement indisponible</span>;
+
+  async function download() {
+    setError(null);
+    setDownloading(true);
+    try {
+      const { blob, filename } = await tenantApi.downloadExport(job.id);
+      const objectUrl = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = objectUrl;
+      link.download = filename ?? job.fileName ?? 'export.bin';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(objectUrl);
+    } catch (downloadError) {
+      setError(downloadError instanceof Error ? downloadError.message : 'Telechargement impossible');
+    } finally {
+      setDownloading(false);
+    }
+  }
+
   return (
-    <a className="button-link" href={tenantApi.exportDownloadUrl(job.id)}>
-      Telecharger
-    </a>
+    <>
+      <button type="button" onClick={download} disabled={downloading}>
+        {downloading ? 'Telechargement...' : 'Telecharger'}
+      </button>
+      {error ? <p className="error-text">{error}</p> : null}
+    </>
   );
 }
 

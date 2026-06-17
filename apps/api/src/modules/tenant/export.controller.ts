@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Param, Post, Req, StreamableFile, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Post,
+  Req,
+  StreamableFile,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 
@@ -31,14 +41,17 @@ export class ExportController {
   }
 
   @Get('exports/:exportJobId')
-  get(@CurrentTenantContext() ctx: TenantAccessContext, @Param('exportJobId') exportJobId: string) {
+  get(
+    @CurrentTenantContext() ctx: TenantAccessContext,
+    @Param('exportJobId', ParseUUIDPipe) exportJobId: string,
+  ) {
     return this.exportService.get(ctx, exportJobId);
   }
 
   @Get('exports/:exportJobId/download')
   async download(
     @CurrentTenantContext() ctx: TenantAccessContext,
-    @Param('exportJobId') exportJobId: string,
+    @Param('exportJobId', ParseUUIDPipe) exportJobId: string,
     @Req() request: Request,
   ) {
     const { job, buffer } = await this.exportService.download(
@@ -55,7 +68,7 @@ export class ExportController {
   @Post('exports/:exportJobId/cancel')
   cancel(
     @CurrentTenantContext() ctx: TenantAccessContext,
-    @Param('exportJobId') exportJobId: string,
+    @Param('exportJobId', ParseUUIDPipe) exportJobId: string,
     @Req() request: Request,
   ) {
     return this.exportService.cancel(ctx, exportJobId, this.metadata(request));
@@ -64,7 +77,7 @@ export class ExportController {
   @Post('exports/:exportJobId/retry')
   retry(
     @CurrentTenantContext() ctx: TenantAccessContext,
-    @Param('exportJobId') exportJobId: string,
+    @Param('exportJobId', ParseUUIDPipe) exportJobId: string,
     @Req() request: Request,
   ) {
     return this.exportService.retry(ctx, exportJobId, this.metadata(request));
@@ -73,7 +86,7 @@ export class ExportController {
   @Post('processes/:id/exports/process-sheet')
   processSheet(
     @CurrentTenantContext() ctx: TenantAccessContext,
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Req() request: Request,
   ) {
     return this.exportService.processExport(
@@ -88,7 +101,7 @@ export class ExportController {
   @Post('processes/:id/exports/procedure')
   procedure(
     @CurrentTenantContext() ctx: TenantAccessContext,
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: Partial<CreateExportDto>,
     @Req() request: Request,
   ) {
@@ -104,7 +117,7 @@ export class ExportController {
   @Post('processes/:id/exports/raci')
   raci(
     @CurrentTenantContext() ctx: TenantAccessContext,
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Req() request: Request,
   ) {
     return this.exportService.processExport(ctx, id, 'raci_matrix', 'xlsx', this.metadata(request));
@@ -113,7 +126,7 @@ export class ExportController {
   @Post('processes/:id/exports/bpmn')
   bpmn(
     @CurrentTenantContext() ctx: TenantAccessContext,
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Req() request: Request,
   ) {
     return this.exportService.processExport(
@@ -128,7 +141,7 @@ export class ExportController {
   @Post('processes/:id/exports/risks')
   risks(
     @CurrentTenantContext() ctx: TenantAccessContext,
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Req() request: Request,
   ) {
     return this.exportService.processExport(
@@ -143,7 +156,7 @@ export class ExportController {
   @Post('processes/:id/exports/kpis')
   kpis(
     @CurrentTenantContext() ctx: TenantAccessContext,
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Req() request: Request,
   ) {
     return this.exportService.processExport(
@@ -158,7 +171,7 @@ export class ExportController {
   @Post('processes/:id/exports/backlog')
   backlog(
     @CurrentTenantContext() ctx: TenantAccessContext,
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Req() request: Request,
   ) {
     return this.exportService.processExport(ctx, id, 'backlog', 'xlsx', this.metadata(request));
@@ -167,7 +180,7 @@ export class ExportController {
   @Post('processes/:id/exports/full-package')
   fullPackage(
     @CurrentTenantContext() ctx: TenantAccessContext,
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Req() request: Request,
   ) {
     return this.exportService.processExport(ctx, id, 'full_package', 'zip', this.metadata(request));
@@ -176,7 +189,7 @@ export class ExportController {
   @Post('directions/:id/exports/summary')
   directionSummary(
     @CurrentTenantContext() ctx: TenantAccessContext,
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Req() request: Request,
   ) {
     return this.exportService.directionSummary(ctx, id, 'pdf', this.metadata(request));

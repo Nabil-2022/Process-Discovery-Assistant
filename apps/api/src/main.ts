@@ -33,7 +33,7 @@ async function bootstrap() {
     }),
   );
 
-  if (process.env.ENABLE_SWAGGER === 'true' || process.env.NODE_ENV !== 'production') {
+  if (process.env.ENABLE_SWAGGER === 'true') {
     const config = new DocumentBuilder()
       .setTitle('Process Discovery Assistant API')
       .setDescription('Versioned REST API for Process Discovery Assistant.')

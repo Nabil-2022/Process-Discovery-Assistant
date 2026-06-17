@@ -179,6 +179,27 @@ describe('ExportService', () => {
     expect(result.status).toBe(ExportJobStatus.FAILED);
   });
 
+  it('exports records that contain bigint values', async () => {
+    const { service, prisma, storage } = createService();
+    prisma.process.findFirst.mockResolvedValue(
+      processFixture({ eventLogImports: [{ id: 'import-a', status: 'ANALYZED', rowCount: 10n }] }),
+    );
+    prisma.exportJob.create.mockResolvedValue(job());
+    prisma.exportJob.update
+      .mockResolvedValueOnce(job({ status: ExportJobStatus.PROCESSING }))
+      .mockImplementationOnce(async ({ data }) => job({ ...data }));
+    prisma.auditLog.create.mockResolvedValue({});
+
+    const result = await service.create(
+      tenantAdmin(),
+      { process_id: 'process-a', export_type: 'process_sheet', export_format: 'pdf' },
+      metadata,
+    );
+
+    expect(result.status).toBe(ExportJobStatus.COMPLETED);
+    expect(storage.uploadBuffer).toHaveBeenCalled();
+  });
+
   it('refuses download for another tenant and audits download', async () => {
     const { service, prisma, storage } = createService();
     prisma.exportJob.findFirst.mockResolvedValue(null);

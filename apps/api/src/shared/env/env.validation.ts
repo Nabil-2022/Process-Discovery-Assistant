@@ -1,6 +1,14 @@
 import { z } from 'zod';
 
 const optionalUrl = z.string().url().optional().or(z.literal(''));
+const envBoolean = z.preprocess((value) => {
+  if (typeof value === 'string') {
+    const normalized = value.trim().toLowerCase();
+    if (['true', '1', 'yes', 'on'].includes(normalized)) return true;
+    if (['false', '0', 'no', 'off', ''].includes(normalized)) return false;
+  }
+  return value;
+}, z.boolean());
 const urlOrAbsolutePath = z
   .string()
   .min(1)
@@ -21,7 +29,7 @@ const envSchema = z.object({
   API_URL: urlOrAbsolutePath,
   FRONTEND_URL: z.string().url().optional(),
   CORS_ORIGIN: z.string().optional(),
-  ENABLE_SWAGGER: z.coerce.boolean().optional().default(false),
+  ENABLE_SWAGGER: envBoolean.optional().default(false),
   AI_PROVIDER: z.string().optional(),
   AI_API_KEY: z.string().optional(),
   AZURE_OPENAI_API_KEY: z.string().optional(),
@@ -42,11 +50,11 @@ const envSchema = z.object({
   LOGIN_RATE_LIMIT_WINDOW_SECONDS: z.coerce.number().int().positive().optional().default(60),
   PASSWORD_RESET_EXPIRES_IN: z.string().optional().default('30m'),
   INVITATION_EXPIRES_IN: z.string().optional().default('7d'),
-  COOKIE_SECURE: z.coerce.boolean().optional().default(false),
+  COOKIE_SECURE: envBoolean.optional().default(false),
   COOKIE_SAME_SITE: z.enum(['lax', 'strict', 'none']).optional().default('lax'),
   COOKIE_DOMAIN: z.string().optional(),
   SUPPORT_ACCESS_MAX_DAYS: z.coerce.number().int().positive().max(90).optional().default(14),
-  LOCAL_AUTH_BYPASS: z.coerce.boolean().optional().default(false),
+  LOCAL_AUTH_BYPASS: envBoolean.optional().default(false),
 });
 
 export type AppEnvironment = z.infer<typeof envSchema>;

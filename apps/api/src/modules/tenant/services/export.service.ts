@@ -12,6 +12,7 @@ import {
   buildDocxFile,
   buildJsonFile,
   buildPdfFile,
+  safeStringify,
   buildXlsxFile,
   buildXmlFile,
   buildZipFile,
@@ -72,18 +73,20 @@ export class ExportService {
 
   list(ctx: TenantAccessContext) {
     this.assertCanExport(ctx);
-    return this.prisma.exportJob.findMany({
-      where: { tenantId: ctx.tenantId },
-      orderBy: { createdAt: 'desc' },
-      take: 100,
-    });
+    return this.prisma.exportJob
+      .findMany({
+        where: { tenantId: ctx.tenantId },
+        orderBy: { createdAt: 'desc' },
+        take: 100,
+      })
+      .then((jobs) => jobs.map((job) => this.serializeJob(job)));
   }
 
   async get(ctx: TenantAccessContext, id: string) {
     this.assertCanExport(ctx);
     const job = await this.prisma.exportJob.findFirst({ where: { id, tenantId: ctx.tenantId } });
     if (!job) throw new NotFoundException('Export introuvable.');
-    return job;
+    return this.serializeJob(job);
   }
 
   async download(ctx: TenantAccessContext, id: string, metadata: RequestMetadata) {
@@ -196,7 +199,7 @@ export class ExportService {
         metadata,
       );
       await this.notifyExport(ctx, completed, 'completed');
-      return completed;
+      return this.serializeJob(completed);
     } catch (error) {
       const failed = await this.prisma.exportJob.update({
         where: { id },
@@ -208,7 +211,7 @@ export class ExportService {
       });
       await this.audit(ctx, 'export_failed', 'export_jobs', id, this.auditMeta(failed), metadata);
       await this.notifyExport(ctx, failed, 'failed');
-      return failed;
+      return this.serializeJob(failed);
     }
   }
 
@@ -370,7 +373,7 @@ export class ExportService {
       ['Cle', 'Valeur'],
       ...Object.entries(data as Record<string, unknown>).map(([key, value]) => [
         key,
-        JSON.stringify(value),
+        safeStringify(value),
       ]),
     ];
   }
@@ -464,6 +467,13 @@ export class ExportService {
       file_name: job.fileName,
       checksum: job.checksum,
       size: job.size ? Number(job.size) : undefined,
+    };
+  }
+
+  private serializeJob<T extends { size?: bigint | number | null }>(job: T) {
+    return {
+      ...job,
+      size: typeof job.size === 'bigint' ? Number(job.size) : job.size,
     };
   }
 

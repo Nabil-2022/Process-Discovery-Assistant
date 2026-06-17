@@ -8,7 +8,7 @@ export function buildJsonFile(filename: string, value: unknown): BuiltExportFile
   return {
     filename,
     mimeType: 'application/json',
-    buffer: Buffer.from(JSON.stringify(value, null, 2), 'utf8'),
+    buffer: Buffer.from(safeStringify(value), 'utf8'),
   };
 }
 
@@ -165,7 +165,7 @@ function columnName(index: number) {
 }
 
 function plainText(value: unknown) {
-  return typeof value === 'string' ? value : JSON.stringify(value, null, 2);
+  return typeof value === 'string' ? value : safeStringify(value);
 }
 
 function csvCell(value: unknown) {
@@ -182,4 +182,18 @@ function xmlEscape(value: string) {
 
 function pdfEscape(value: string) {
   return value.replace(/[()\\\r\n]/g, ' ').slice(0, 8000);
+}
+
+export function safeStringify(value: unknown) {
+  return JSON.stringify(
+    value,
+    (_key, item: unknown) => {
+      if (typeof item === 'bigint') return Number(item);
+      if (item && typeof item === 'object' && 'toJSON' in item) {
+        return (item as { toJSON: () => unknown }).toJSON();
+      }
+      return item;
+    },
+    2,
+  );
 }

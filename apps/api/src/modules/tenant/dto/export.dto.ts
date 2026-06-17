@@ -1,4 +1,4 @@
-import { IsIn, IsObject, IsOptional, IsString } from 'class-validator';
+import { IsIn, IsObject, IsOptional, IsUUID } from 'class-validator';
 
 export const EXPORT_TYPES = [
   'process_sheet',
@@ -29,11 +29,11 @@ export class CreateExportDto {
   export_format!: ExportFormatDto;
 
   @IsOptional()
-  @IsString()
+  @IsUUID()
   process_id?: string;
 
   @IsOptional()
-  @IsString()
+  @IsUUID()
   direction_id?: string;
 
   @IsOptional()

@@ -1,0 +1,25 @@
+services:
+  api:
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      APP_URL: http://localhost
+      FRONTEND_URL: http://localhost
+      CORS_ORIGIN: http://localhost,http://localhost:5173,http://127.0.0.1,http://127.0.0.1:5173
+      API_URL: http://localhost:8050/api/v1
+      DATABASE_URL: postgresql://process_discovery:process_discovery@postgres:5432/process_discovery_local?schema=process_discovery
+      DIRECT_DATABASE_URL: postgresql://process_discovery:process_discovery@postgres:5432/process_discovery_local?schema=process_discovery
+      SMTP_HOST: mailpit
+      SMTP_PORT: '1025'
+      STORAGE_LOCAL_PATH: /app/storage/exports
+      COOKIE_DOMAIN: ''
+      COOKIE_SECURE: 'false'
+      COOKIE_SAME_SITE: lax
+      LOCAL_AUTH_BYPASS: 'false'
+
+  web:
+    build:
+      args:
+        VITE_API_URL: http://localhost:8050/api/v1
+    ports:
+      - '8080:80'

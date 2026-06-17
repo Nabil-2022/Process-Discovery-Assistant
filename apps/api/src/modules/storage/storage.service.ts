@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { createHash } from 'node:crypto';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
-import { dirname, join, normalize, resolve } from 'node:path';
+import { dirname, isAbsolute, join, normalize, relative, resolve } from 'node:path';
 
 type UploadBufferInput = {
   tenantId: string;
@@ -50,7 +50,8 @@ export class StorageService {
 
   private absolutePath(objectKey: string) {
     const fullPath = resolve(this.root, objectKey);
-    if (!fullPath.startsWith(`${this.root}\\`) && fullPath !== this.root) {
+    const relativePath = relative(this.root, fullPath);
+    if (relativePath.startsWith('..') || isAbsolute(relativePath)) {
       throw new NotFoundException('Objet introuvable.');
     }
     return fullPath;

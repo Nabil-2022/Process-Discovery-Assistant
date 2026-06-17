@@ -626,7 +626,7 @@ export class ProcessService {
     }
     if (step === 3 && Array.isArray(payload.activities)) {
       for (const item of payload.activities as ActivityDto[])
-        await this.createActivity(ctx, processId, item, {});
+        await this.createOrUpdateWizardActivity(ctx, processId, item);
     }
     if (step === 4 && Array.isArray(payload.responsibilities)) {
       await this.updateResponsibilities(
@@ -636,6 +636,185 @@ export class ProcessService {
         {},
       );
     }
+    if (step === 5) await this.saveWizardDocument(ctx, processId, payload);
+    if (step === 6) await this.saveWizardApplication(ctx, processId, payload);
+    if (step === 7) await this.saveWizardKpi(ctx, processId, payload);
+    if (step === 8) await this.saveWizardRisk(ctx, processId, payload);
+    if (step === 9) await this.saveWizardPainPoint(ctx, processId, payload);
+    if (step === 10) await this.saveWizardAutomationNeed(ctx, processId, payload);
+  }
+
+  private async createOrUpdateWizardActivity(
+    ctx: TenantAccessContext,
+    processId: string,
+    dto: ActivityDto,
+  ) {
+    const name = dto.name?.trim();
+    if (!name) return;
+    const existing = await this.prisma.processActivity.findFirst({
+      where: { tenantId: ctx.tenantId, processId, name, deletedAt: null },
+    });
+    if (existing) {
+      await this.prisma.processActivity.update({
+        where: { id: existing.id },
+        data: {
+          description: dto.description,
+          activityType: dto.activity_type,
+          inputText: dto.input_text,
+          outputText: dto.output_text,
+          condition: dto.condition,
+          duration: dto.duration,
+          isAutomated: dto.is_automated ?? existing.isAutomated,
+          updatedBy: ctx.actorUserId,
+        },
+      });
+      return;
+    }
+    await this.createActivity(ctx, processId, dto, {});
+  }
+
+  private async saveWizardDocument(
+    ctx: TenantAccessContext,
+    processId: string,
+    payload: Record<string, unknown>,
+  ) {
+    const title = this.text(payload.document_title ?? payload.title);
+    if (!title) return;
+    const existing = await this.prisma.processDocument.findFirst({
+      where: { tenantId: ctx.tenantId, processId },
+      include: { document: true },
+    });
+    if (existing) {
+      await this.prisma.document.update({
+        where: { id: existing.documentId },
+        data: { title, documentType: 'reference', status: DocumentStatus.DRAFT, deletedAt: null },
+      });
+      return;
+    }
+    await this.createRelationRecord(ctx, processId, 'documents', {
+      title,
+      document_type: 'reference',
+      usage_type: 'reference',
+    });
+  }
+
+  private async saveWizardApplication(
+    ctx: TenantAccessContext,
+    processId: string,
+    payload: Record<string, unknown>,
+  ) {
+    const name = this.text(payload.application_name ?? payload.name);
+    if (!name) return;
+    const existing = await this.prisma.processApplication.findFirst({
+      where: { tenantId: ctx.tenantId, processId },
+      include: { application: true },
+    });
+    if (existing) {
+      await this.prisma.application.update({
+        where: { id: existing.applicationId },
+        data: { name, deletedAt: null },
+      });
+      return;
+    }
+    await this.createRelationRecord(ctx, processId, 'applications', { name, usage: 'support' });
+  }
+
+  private async saveWizardKpi(
+    ctx: TenantAccessContext,
+    processId: string,
+    payload: Record<string, unknown>,
+  ) {
+    const name = this.text(payload.kpi_name ?? payload.name);
+    if (!name) return;
+    const existing = await this.prisma.kpi.findFirst({
+      where: { tenantId: ctx.tenantId, processId, deletedAt: null },
+    });
+    const data = {
+      name,
+      objective: this.text(payload.objective) ?? 'Piloter la performance du processus.',
+      definition: this.text(payload.definition) ?? name,
+      unit: this.text(payload.unit) ?? 'unite',
+    };
+    if (existing) {
+      await this.prisma.kpi.update({ where: { id: existing.id }, data });
+      return;
+    }
+    await this.createRelationRecord(ctx, processId, 'kpis', data);
+  }
+
+  private async saveWizardRisk(
+    ctx: TenantAccessContext,
+    processId: string,
+    payload: Record<string, unknown>,
+  ) {
+    const description = this.text(payload.risk_description ?? payload.description);
+    if (!description) return;
+    const existing = await this.prisma.risk.findFirst({
+      where: { tenantId: ctx.tenantId, processId, deletedAt: null },
+    });
+    const data = {
+      description,
+      category: this.text(payload.category) ?? 'Risque processus',
+      probability: this.number(payload.probability, 3),
+      impact: this.number(payload.impact, 3),
+      inherentLevel: this.riskLevel(this.number(payload.probability, 3), this.number(payload.impact, 3)),
+    };
+    if (existing) {
+      await this.prisma.risk.update({ where: { id: existing.id }, data });
+      return;
+    }
+    await this.createRelationRecord(ctx, processId, 'risks', data);
+  }
+
+  private async saveWizardPainPoint(
+    ctx: TenantAccessContext,
+    processId: string,
+    payload: Record<string, unknown>,
+  ) {
+    const description = this.text(payload.pain_point ?? payload.description);
+    if (!description) return;
+    const existing = await this.prisma.painPoint.findFirst({
+      where: { tenantId: ctx.tenantId, processId },
+    });
+    const data = {
+      description,
+      frequency: this.text(payload.frequency) ?? 'Occasionnelle',
+      impact: this.text(payload.impact) ?? 'Impact operationnel',
+    };
+    if (existing) {
+      await this.prisma.painPoint.update({ where: { id: existing.id }, data });
+      return;
+    }
+    await this.createRelationRecord(ctx, processId, 'pain-points', data);
+  }
+
+  private async saveWizardAutomationNeed(
+    ctx: TenantAccessContext,
+    processId: string,
+    payload: Record<string, unknown>,
+  ) {
+    const description = this.text(payload.automation_need ?? payload.description);
+    if (!description) return;
+    const existing = await this.prisma.automationNeed.findFirst({
+      where: { tenantId: ctx.tenantId, processId },
+    });
+    const data = {
+      description,
+      expected_gain: this.text(payload.expected_gain) ?? 'Gain de temps et meilleure tracabilite',
+      priority: this.text(payload.priority) ?? 'MEDIUM',
+    };
+    if (existing) {
+      await this.prisma.automationNeed.update({
+        where: { id: existing.id },
+        data: {
+          description: data.description,
+          expectedGain: data.expected_gain,
+          priority: data.priority,
+        },
+      });
+      return;
+    }
+    await this.createRelationRecord(ctx, processId, 'automation-needs', data);
   }
 
   private async updateProcessFields(
@@ -813,6 +992,17 @@ export class ProcessService {
     ) {
       throw new ForbiddenException('Ecriture processus refusee.');
     }
+  }
+
+  private text(value: unknown) {
+    if (typeof value !== 'string') return undefined;
+    const trimmed = value.trim();
+    return trimmed || undefined;
+  }
+
+  private number(value: unknown, fallback: number) {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : fallback;
   }
 
   private assertLock(current: number, provided?: number) {

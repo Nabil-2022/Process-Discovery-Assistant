@@ -2876,8 +2876,14 @@ export function ProcessWizardPage() {
       trigger_event: process.triggerEvent ?? '',
       input_name: process.inputs?.[0]?.name ?? '',
       output_name: process.outputs?.[0]?.name ?? '',
-      activity_name: process.activities?.[0]?.name ?? '',
-      activity_output: process.activities?.[0]?.outputText ?? '',
+      activity_name: '',
+      activity_output: '',
+      document_title: firstNestedText(process.documents, 'document', 'title'),
+      application_name: firstNestedText(process.applications, 'application', 'name'),
+      kpi_name: firstText(process.kpis, 'name'),
+      risk_description: firstText(process.risks, 'description'),
+      pain_point: firstText(process.painPoints, 'description'),
+      automation_need: firstText(process.automationNeeds, 'description'),
     });
   }, [form, process]);
 
@@ -3243,7 +3249,44 @@ function payloadForStep(step: number, values: WizardForm, process?: ProcessItem)
     ].filter(Boolean);
     return { responsibilities: items };
   }
+  if (step === 5 && values.document_title) {
+    return { document_title: values.document_title };
+  }
+  if (step === 6 && values.application_name) {
+    return { application_name: values.application_name };
+  }
+  if (step === 7 && values.kpi_name) {
+    return { kpi_name: values.kpi_name };
+  }
+  if (step === 8 && values.risk_description) {
+    return { risk_description: values.risk_description };
+  }
+  if (step === 9 && values.pain_point) {
+    return { pain_point: values.pain_point };
+  }
+  if (step === 10 && values.automation_need) {
+    return { automation_need: values.automation_need };
+  }
   return {};
+}
+
+function firstNestedText(items: unknown[] | undefined, nestedKey: string, field: string) {
+  const value = items?.find(Boolean);
+  if (!value || typeof value !== 'object') return '';
+  const nested = (value as Record<string, unknown>)[nestedKey];
+  if (!nested || typeof nested !== 'object') return '';
+  return firstRecordText(nested as Record<string, unknown>, field);
+}
+
+function firstText(items: unknown[] | undefined, field: string) {
+  const value = items?.find(Boolean);
+  if (!value || typeof value !== 'object') return '';
+  return firstRecordText(value as Record<string, unknown>, field);
+}
+
+function firstRecordText(record: Record<string, unknown>, field: string) {
+  const value = record[field];
+  return typeof value === 'string' ? value : '';
 }
 
 function Score({ completeness }: { completeness?: Completeness }) {

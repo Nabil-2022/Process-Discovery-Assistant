@@ -275,6 +275,7 @@ function buildDirections(processes: ProcessItem[]): DirectionGroup[] {
       ...group,
       processes: group.processes.sort(
         (left, right) =>
+          processOrder(left) - processOrder(right) ||
           new Date(right.updatedAt).getTime() - new Date(left.updatedAt).getTime() ||
           left.name.localeCompare(right.name),
       ),
@@ -292,7 +293,7 @@ function buildMegaBpmnGraph(directions: DirectionGroup[]): { nodes: MegaNode[]; 
   const startX = 80;
   const topY = 72;
   const processTopY = 168;
-  const directionNodes: string[] = [];
+  const processNodes: { id: string; process: ProcessItem }[] = [];
 
   nodes.push({
     id: 'mega-start',
@@ -321,7 +322,7 @@ function buildMegaBpmnGraph(directions: DirectionGroup[]): { nodes: MegaNode[]; 
 
     direction.processes.forEach((process, processIndex) => {
       const processNodeId = `process-${process.id}`;
-      directionNodes.push(processNodeId);
+      processNodes.push({ id: processNodeId, process });
       nodes.push({
         id: processNodeId,
         type: 'megaProcess',
@@ -352,14 +353,25 @@ function buildMegaBpmnGraph(directions: DirectionGroup[]): { nodes: MegaNode[]; 
     });
   });
 
-  for (let index = 0; index < directionNodes.length - 1; index += 1) {
-    const source = directionNodes[index];
-    const target = directionNodes[index + 1];
-    if (!source || !target || edges.some((item) => item.source === source && item.target === target)) continue;
+  const sequencedProjectNodes = processNodes
+    .filter(({ process }) => processOrder(process) < Number.MAX_SAFE_INTEGER)
+    .sort((left, right) => processOrder(left.process) - processOrder(right.process));
+  const transverseNodes = sequencedProjectNodes.length > 1 ? sequencedProjectNodes : processNodes;
+
+  for (let index = 0; index < transverseNodes.length - 1; index += 1) {
+    const source = transverseNodes[index]?.id;
+    const target = transverseNodes[index + 1]?.id;
+    if (
+      !source ||
+      !target ||
+      edges.some((item) => item.source === source && item.target === target)
+    )
+      continue;
     edges.push(edge(`transverse-${index}`, source, target, true));
   }
 
-  if (directionNodes[0]) edges.push(edge('start-to-first-process', 'mega-start', directionNodes[0]));
+  const firstNode = transverseNodes[0]?.id;
+  if (firstNode) edges.push(edge('start-to-first-process', 'mega-start', firstNode));
 
   const endX = startX + directions.length * (laneWidth + laneGap) - laneGap + 70;
   nodes.push({
@@ -369,10 +381,15 @@ function buildMegaBpmnGraph(directions: DirectionGroup[]): { nodes: MegaNode[]; 
     data: { label: 'Fin', subtitle: 'Portefeuille' },
     draggable: false,
   });
-  const lastNode = directionNodes[directionNodes.length - 1];
+  const lastNode = transverseNodes[transverseNodes.length - 1]?.id;
   if (lastNode) edges.push(edge('last-process-to-end', lastNode, 'mega-end'));
 
   return { nodes, edges };
+}
+
+function processOrder(process: ProcessItem) {
+  const match = process.code?.match(/^MAP-WEB-(\d+)$/i);
+  return match?.[1] ? Number(match[1]) : Number.MAX_SAFE_INTEGER;
 }
 
 function edge(id: string, source: string | undefined, target: string | undefined, transverse = false): Edge {

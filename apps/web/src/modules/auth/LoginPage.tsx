@@ -32,8 +32,8 @@ export function LoginPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const nextPath = safeNextPath(searchParams.get('next'));
-  const [email, setEmail] = useState('tenant.admin@example.test');
-  const [password, setPassword] = useState('ChangeMe12345!');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [remember, setRemember] = useState(true);
   const [tokenForTenantSelection, setTokenForTenantSelection] = useState<string | null>(null);
   const [tenants, setTenants] = useState<TenantChoice[]>([]);

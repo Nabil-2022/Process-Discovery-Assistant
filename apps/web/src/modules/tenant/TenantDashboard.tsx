@@ -238,7 +238,7 @@ export function TenantHeader() {
     <header className="admin-header">
       <BrandLogo variant="sidebar" />
       <div>
-        <p className="eyebrow">Tenant MAP</p>
+        <p className="eyebrow">Tenant demo</p>
         <h1>Dashboard cartographie</h1>
       </div>
       <nav className="admin-tabs">

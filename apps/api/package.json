@@ -10,6 +10,7 @@
     "test": "vitest run",
     "seed": "tsx prisma/seed.ts",
     "seed:map-web-usecase": "tsx prisma/seed-map-website-usecase.ts",
+    "seed:tenant-demo": "tsx prisma/seed-tenant-demo.ts",
     "prisma:format": "prisma format",
     "prisma:validate": "prisma validate",
     "prisma:generate": "prisma generate",

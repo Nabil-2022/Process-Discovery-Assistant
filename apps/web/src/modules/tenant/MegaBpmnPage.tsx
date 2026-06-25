@@ -387,7 +387,7 @@ function buildMegaBpmnGraph(directions: DirectionGroup[]): { nodes: MegaNode[]; 
 }
 
 function processOrder(process: ProcessItem) {
-  const match = process.code?.match(/^MAP-WEB-(\d+)$/i);
+  const match = process.code?.match(/^[A-Z0-9]+-WEB-(\d+)$/i);
   return match?.[1] ? Number(match[1]) : Number.MAX_SAFE_INTEGER;
 }
 

@@ -8,7 +8,6 @@ import {
 } from './session';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api/v1';
-const DEFAULT_TENANT_SLUG = 'map-demo';
 
 type TenantChoice = {
   tenant_id: string;
@@ -63,7 +62,6 @@ export function LoginPage() {
           email,
           password,
           remember_me: remember,
-          tenant_slug: DEFAULT_TENANT_SLUG,
         }),
       });
 

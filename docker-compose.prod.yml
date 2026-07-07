@@ -59,7 +59,7 @@ services:
       args:
         VITE_API_URL: ${PDA_PUBLIC_API_URL:-http://197.153.60.68:8050/api/v1}
     ports:
-      - '80:80'
+      - '8054:80'
     restart: unless-stopped
     depends_on:
       api:
